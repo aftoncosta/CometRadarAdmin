@@ -32,11 +32,11 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="admin-dash.html"><img src="img/cr.png"></a>
+          <a class="navbar-brand" href="dash.html"><img src="img/cr.png"></a>
         </div>
         <div class="navbar-collapse collapse" id="navbar">
           <ul class="nav navbar-nav navbar-right">
-            <li><a href="admin-dash.html">Dashboard</a></li>
+            <li><a href="dash.html">Dashboard</a></li>
             <li class="active"><a href="stats.html">Statistics</a></li>
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Routes <span class="caret"></span></a>
@@ -70,7 +70,8 @@
               <ul class="dropdown-menu" role="menu">
                 <li><a href="#">McDermott Library</a></li>
                 <li><a href="#">University Commons</a></li>
-                <li><a href="#">University Village Phase 1</a></li>
+                <li><a href="#">University Village Phase 5 & 6</a></li>
+                <li><a href="#">University Village Phase 1 & 2</a></li>
                 <li><a href="#">Rutford Avenue North-South</a></li>
               </ul>
             </div>
@@ -149,24 +150,15 @@
           </ul>
         </div>
         <div class="col-md-9 col-md-offset-3 main" contentEditable="true">
-          <iframe class="map" frameBorder="0" scrolling="no" src="maps/heat-map.html"></iframe>
+          <iframe class="map" frameBorder="0" scrolling="no" src="maps/stats-map.html"></iframe>
         </div>
       </div>
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
-
     <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-    <script>
-      $(function() {
-        $( "#datepicker" ).datepicker();
-      });
-      
-      var myDate = new Date();
-      var prettyDate =(myDate.getMonth()+1) + '/' + myDate.getDate() + '/' + myDate.getFullYear();
-      $("#datepicker").val(prettyDate);
-    </script>
+    <script src="js/stats.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="js/ie10-viewport-bug-workaround.js"></script>
   </body>

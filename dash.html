@@ -31,11 +31,11 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="admin-dash.html"><img src="img/cr.png"></a>
+          <a class="navbar-brand" href="dash.html"><img src="img/cr.png"></a>
         </div>
         <div class="navbar-collapse collapse" id="navbar">
           <ul class="nav navbar-nav navbar-right">
-            <li class="active"><a href="admin-dash.html">Dashboard</a></li>
+            <li class="active"><a href="dash.html">Dashboard</a></li>
             <li><a href="stats.html">Statistics</a></li>
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Routes <span class="caret"></span></a>
@@ -58,18 +58,15 @@
         <div class="col-md-3 sidebar" >
           <ul class="nav nav-sidebar" >
             <li class=" lead"><h3>Details</h3></li>
-            CometCab #1<br>
-            Status: on-duty<br>
-            Route: University Village Phase 1<br>
-            Driver: Chris<br>
-            Shift: 1pm-4pm<br>
-            Current Occupancy: 3<br><br/><br/>
+            <div id="cabDetails">
+            Click on a Comet Cab for details
+            </div><br><br/><br/>
           </ul>
           <ul class="nav nav-sidebar">
             <li class=" lead"><h3>Rider Count</h3></li>
-            Today: 83<br/>
-            Last hour: 16<br/>
-            <a><span class="glyphicon glyphicon-stats" aria-hidden="true"></span> View Shuttle Statistics</a>
+            <div id="riderCounts">
+            Click on a Comet Cab for rider counts
+            </div>
           </ul>
         </div>
         <div class="col-md-9 col-md-offset-3 main" contentEditable="true">
