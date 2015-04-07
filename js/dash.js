@@ -1,4 +1,3 @@
-
 var overlay;
 USGSOverlay.prototype = new google.maps.OverlayView();
 
