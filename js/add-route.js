@@ -133,37 +133,3 @@ function computeTotalDistance(result) {
 
 
 google.maps.event.addDomListener(window, 'load', initialize);
-
-var jq = document.createElement('script');
-jq.src = "//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js";
-document.querySelector('head').appendChild(jq);
-
-jq.onload = procede;//DON'T TYPE PARENTHESIS
-
-//i.e. 'procede()' runs instantly and assigns return value to jq.onload
-//     'procede' gives it a function to run when it's ready (what you want)
-
-
-function procede()
-{
-  $.ajaxPrefilter( "json script", function( options ) {
-  options.crossDomain = true;
-  });
-//jQuery commands are loaded (do your magic)
- // var ip = '104.154.90.207:3000';
-  //route = ip + '/api/getRoutes'
-  var ip = 'localhost:3000';
-
-
-  $.get( '/', function(data) {
- //$('#results').html(data);
-  console.log('TESTING');
-  console.log(data);
-
-  });
-
-
-
-}
-
-

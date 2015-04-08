@@ -1,9 +1,27 @@
 var overlay;
 USGSOverlay.prototype = new google.maps.OverlayView();
 
-/***********************************************************************
- * DB CALL: Fill "cabs" with the locations of each cab
- ***********************************************************************/
+
+
+
+$.ajax({
+    url: 'http://127.0.0.1:3000/route-data',
+    type: 'GET',
+    dataType: 'json',
+    timeout: 5000,
+    success: function(data) {
+        console.log(data);
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+        alert('error ' + textStatus + " " + errorThrown);
+    }
+});
+
+
+
+
+
+
 var cabs = [
   ['Route 1', 32.980800, -96.750678],
   ['Route 2', 32.9856748, -96.75524339999998],

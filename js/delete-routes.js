@@ -4,7 +4,7 @@ $.ajax({
     dataType: 'json',
     timeout: 5000,
     success: function(data) {
-        console.log(data)
+        
         for(var i in data){
             document.getElementById("route-list").innerHTML = document.getElementById("route-list").innerHTML 
                                                             + '<a class="list-group-item" onclick="deleteRoute(' + "'" 
@@ -20,13 +20,12 @@ $.ajax({
 function deleteRoute(name){
     console.log('delete ' + name);
 
+    var json = { FFFFFOOOOOOOOOOOOOOOO : "BARRRRRRRRRRRRRRRRRRRR"};
+    console.log(json);
     $.ajax({
-        type: 'POST',
+        method: 'POST',
         url: 'http://127.0.0.1:3000/delete-route',
-        data: {
-            "test": "name"
-        },
-        contentType: "application/json; charset=utf-8",
-        dataType: "json",
+        jsonData: { FFFFFOOOOOOOOOOOOOOOO : "BARRRRRRRRRRRRRRRRRRRR"},
+        headers: { "Content-Type": "application/json" }
     });
 };
