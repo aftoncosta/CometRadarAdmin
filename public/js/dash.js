@@ -1,36 +1,16 @@
 var overlay;
 USGSOverlay.prototype = new google.maps.OverlayView();
 
-var cabsInfo;
-
-
-$.ajax({
-    url: 'http://127.0.0.1:3000/route-data',
-    type: 'GET',
-    dataType: 'json',
-    timeout: 5000,
-    async:   false,
-    success: function(data) {
-        cabsInfo = data;
-    },
-    error: function(jqXHR, textStatus, errorThrown) {
-        alert('error ' + textStatus + " " + errorThrown);
-    }
-});
-
-
-
-console.log(cabsInfo);
-
-
-var cabs = [
-  ['Route 1', 32.980800, -96.750678],
-  ['Route 2', 32.9856748, -96.75524339999998],
-  ['Route 3', 32.9855582, -96.7499986],
-  ['Route 4', 32.991000, -96.754754],
-  ['Route 5', 32.990700, -96.751089]
-];
+var map;
+var routeNames = [];
+var cabStatus = [];
+var cabLat = [];
+var cabLong = [];
+var cabNumbers = [];
+var cabOccupancy = [];
+var cabDriver = [];
 var markers = [];
+
 
 // Initialize the map and the custom overlay.
 function initialize() {
@@ -40,7 +20,7 @@ function initialize() {
     mapTypeControl: false
   };
 
-  var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+  map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
 
   var swBound = new google.maps.LatLng(32.976600, -96.761700);
   var neBound = new google.maps.LatLng(32.995650, -96.739400);
@@ -50,12 +30,10 @@ function initialize() {
   // The custom USGSOverlay object contains the USGS image,
   // the bounds of the image, and a reference to the map.
   overlay = new USGSOverlay(bounds, srcImage, map);
-
-  setMarkers(map, cabs);
 }
 
 
-function setMarkers(map, locations) {
+function setMarkers() {
 
   // Image for on-duty cart
   var image_green = {
@@ -82,66 +60,55 @@ function setMarkers(map, locations) {
   };
 
   // Add the markers to the map
-  for (var item in locations){
-    var cart = locations[item];
-    var myLatLng = new google.maps.LatLng(cart[1], cart[2]);
-
-
-    /***********************************************************************
-     * DB CALL: Get status of the cab --> store in onDuty and isFull
-     ***********************************************************************/
-
-    var onDuty = true;
+  for (var item in routeNames){
     var isFull = false;
     var image;
 
-    if (!onDuty){
+    if (!cabStatus[item]){
       image = image_black;
+      cabStatus[item] = 'off duty';
     } else {
-      if (isFull)
+      if (isFull) {
         image = image_red
-      else
+        cabStatus[item] = 'full';
+      } else {
         image = image_green
+        cabStatus[item] = 'on duty';
+      }
     }
 
-    markers[item] = new google.maps.Marker({
-        position: myLatLng,
-        map: map,
-        icon: image,
-        title: cart[0],
-        zIndex: 3
-    });
-  }
-
-  // Add listeners for each marker... 
-  // this populates the cab data check the marker is clicked
-  for (var item in markers){
-    google.maps.event.addListener(markers[item], 'click', function() {
-      var detailDiv = document.getElementById('cabDetails');
-      var riderCountDiv = document.getElementById('riderCounts');
-
-
-      /***********************************************************************
-       * DB CALL: Get status, route, driver name, and occupancy for the cab
-       * The text should go before the <br/> tags
-       ***********************************************************************/
-      parent.document.getElementById("cabDetails").innerHTML = "Status: " + "<br/>"
-                                                              + "Route: " + "<br/>"
-                                                              + "Driver: " + "<br/>"
-                                                              + "Current Occupancy: " + "<br/>";
-
-
-      /***********************************************************************
-       * DB CALL: Get number of riders on a specific day and in the last hour
-       * The text should go before the <br/> tags
-       ***********************************************************************/
-      parent.document.getElementById("riderCounts").innerHTML = "Today: " + "<br/>"
-                                                              + "Last Hour: " + "<br/>";
-    });
+    markers[item] = createMarkers(item, image);
 
   }
 }
 
+function createMarkers(id, image){
+  var myLatLng = new google.maps.LatLng(cabLat[id], cabLong[id]);
+
+  var marker = new google.maps.Marker({
+        position: myLatLng,
+        map: map,
+        icon: image,
+        title: routeNames[id],
+        zIndex: 3
+  });
+
+  google.maps.event.addListener(marker, 'click', function() {
+      var detailDiv = document.getElementById('cabDetails');
+      var riderCountDiv = document.getElementById('riderCounts');
+
+
+      parent.document.getElementById("cabDetails").innerHTML = "Status: " + cabStatus[id] + "<br/>"
+                                                              + "Route: " + routeNames[id] + "<br/>"
+                                                              + "Driver: " + cabDriver[id] + "<br/>"
+                                                              + "Current Occupancy: " + cabOccupancy[id] + "<br/>";
+
+      parent.document.getElementById("riderCounts").innerHTML = "Today: " + "<br/>"
+                                                              + "Last Hour: " + "<br/>";
+
+  });
+  return marker;
+}
 
 function USGSOverlay(bounds, image, map) {
 
@@ -211,5 +178,28 @@ USGSOverlay.prototype.onRemove = function() {
   this.div_.parentNode.removeChild(this.div_);
   this.div_ = null;
 };
+
+$.ajax({
+    url: 'http://127.0.0.1:3000/route-data',
+    type: 'GET',
+    dataType: 'json',
+    timeout: 5000,
+    success: function(data) {
+        cabsInfo = data;
+        for(var cab in data){
+          routeNames[cab]   = data[cab].route_name;
+          cabStatus[cab]    = data[cab].onduty;
+          cabLat[cab]       = data[cab].currentLat;
+          cabLong[cab]      = data[cab].currentLong;
+          cabNumbers[cab]   = data[cab].shuttle;
+          cabOccupancy[cab] = data[cab].students_on_shuttle;
+          cabDriver[cab]    = data[cab].fname + ' ' + data[cab].lname; 
+          setMarkers();
+        }
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+        alert('error ' + textStatus + " " + errorThrown);
+    }
+});
 
 google.maps.event.addDomListener(window, 'load', initialize);
