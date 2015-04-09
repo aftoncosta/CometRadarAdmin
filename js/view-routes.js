@@ -122,9 +122,31 @@
     });
   }
 
-  function changeRoute() {
+  function changeRoute(name) {
+    console.log('change ' + name);
     
   }
 
 
   google.maps.event.addDomListener(window, 'load', initialize);
+
+  $.ajax({
+    url: 'http://127.0.0.1:3000/route-names',
+    type: 'GET',
+    dataType: 'json',
+    timeout: 5000,
+    success: function(data) {
+
+        document.getElementById("dropdown-main").innerText = data[0].route_name;
+        
+        for(var i in data){
+            document.getElementById("route-list").innerHTML = document.getElementById("route-list").innerHTML 
+                                                            + '<li><a href="#" onclick="changeRoute(' + "'" 
+                                                            + data[i].route_name + "'" + ')">'
+                                                            + data[i].route_name + '</a></li>';
+        }
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+        alert('error ' + textStatus + " " + errorThrown);
+    }
+});

@@ -73,3 +73,4 @@ app.get('/route-data', function (req, res) {
 });
 
 app.listen(port);
+console.log('Example app listening at %s', port);
