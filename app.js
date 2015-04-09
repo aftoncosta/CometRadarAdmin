@@ -23,6 +23,23 @@ app.use(function(req, res, next) {
 });
 app.use(express.static(__dirname + "/public"));
 
+//Add a route to the database
+app.get('/add-route', function (req, res) {
+  
+  name = req.query.route;
+  console.log("inside app.js: " + name);
+  origin_lat = '';
+  origin_long = '';
+  dest_lat = '';
+  dest_long = '';
+  waypts = '';
+  connection.query('SELECT rt.*, wp.order, wp.wp_long, wp.wp_lat FROM bsxpccom_cometradar.route_waypoints AS wp RIGHT JOIN bsxpccom_cometradar.routes AS rt ON rt.route_name = wp.route_name WHERE rt.route_name = "' + name + '";', function(err, rows, fields){
+    if (err) throw err;
+    res.send(rows);
+  });
+
+});
+
 //Gets a route's waypoints
 app.get('/route-waypoints', function (req, res) {
   route = req.query.route;

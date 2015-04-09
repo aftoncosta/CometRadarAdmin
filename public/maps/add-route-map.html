@@ -5,9 +5,11 @@
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
 
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/dashboard.css" rel="stylesheet">
     <style>
       html, body, #map-canvas {
-        height: 100%;
+        height: 450px;
         margin: 0px;
         padding: 0px
       }
@@ -15,10 +17,24 @@
 
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAM5N1611dbRnkSCLfoDwzhp0PPZkTnrkY"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
     <script src="../js/add-route.js"></script>
 
   </head>
   <body>
-    <div id="map-canvas"></div>
+    <div class="jumbotron" style="margin: 0px; padding-top: 0px">
+    <input class="form-control" id="name" type="text" value="Route name" onclick="inputClick()"/><br/>
+        
+
+    <div id="map-canvas"></div><br/></br>
+
+
+    <button type="button" class="btn btn-default button-style" onclick="addRoute()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Route</button>
+
+
+
+  </div>
+    
+
   </body>
 </html>
