@@ -23,6 +23,17 @@ app.use(function(req, res, next) {
 });
 app.use(express.static(__dirname + "/public"));
 
+//Gets a route's waypoints
+app.get('/route-waypoints', function (req, res) {
+  route = req.query.route;
+
+  connection.query('SELECT rt.*, wp.order, wp.wp_long, wp.wp_lat FROM bsxpccom_cometradar.route_waypoints AS wp RIGHT JOIN bsxpccom_cometradar.routes AS rt ON rt.route_name = wp.route_name WHERE rt.route_name = "' + route + '";', function(err, rows, fields){
+    if (err) throw err;
+    res.send(rows);
+  });
+
+});
+
 // Deletes a route
 app.get('/delete-route', function (req, res) {
   route = req.query.route;
@@ -65,7 +76,7 @@ app.get('/route-data', function (req, res) {
     function(err, rows, fields){
       if (err) throw err;
       res.send(rows);
-      console.log(rows);
+     // console.log(rows);
     });
 });
 
