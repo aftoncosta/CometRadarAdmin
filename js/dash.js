@@ -1,7 +1,7 @@
 var overlay;
 USGSOverlay.prototype = new google.maps.OverlayView();
 
-
+var cabsInfo;
 
 
 $.ajax({
@@ -9,8 +9,9 @@ $.ajax({
     type: 'GET',
     dataType: 'json',
     timeout: 5000,
+    async:   false,
     success: function(data) {
-        console.log(data);
+        cabsInfo = data;
     },
     error: function(jqXHR, textStatus, errorThrown) {
         alert('error ' + textStatus + " " + errorThrown);
@@ -19,7 +20,7 @@ $.ajax({
 
 
 
-
+console.log(cabsInfo);
 
 
 var cabs = [
@@ -55,8 +56,6 @@ function initialize() {
 
 
 function setMarkers(map, locations) {
-  // Add markers to the map
-
 
   // Image for on-duty cart
   var image_green = {
