@@ -91,10 +91,21 @@
               <ul class="dropdown-menu" role="menu" id="route-list"></ul>
             </div>
 
-            <br/><br/>
-            <p>Date: <input class="form-control" type="text" id="datepicker"></p>
+            <br/><br/>Select Driver:<br/>
+            <div class="btn-group">
+              <button type="button" class="btn btn-default" id="dropdown-main">All</button>
+              <button type="button" class="btn btn-default dropdown-toggle" id="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                <span class="caret"></span>
+                <span class="sr-only">Toggle Dropdown</span>
+              </button>
+              <ul class="dropdown-menu" role="menu" id="driver-list"></ul>
+            </div>
 
-            <button type="button" class="btn button-style" onclick="updateMap()"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Update Map</button><br><br>
+            <br/><br/>
+            <div style="float: left; padding-right: 10px; width: 50%">Start date: <input class="form-control" type="text" id="datepicker"></div>
+            <div style="float: left; padding-left: 10px; width: 50%">End date: <input class="form-control" type="text" id="datepicker2"></div><br/><br/><br/>
+
+            <button style="width: 100%" type="button" class="btn button-style" onclick="updateMap()"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Update Map</button><br><br>
 
             <table class="table">
             <thead>
