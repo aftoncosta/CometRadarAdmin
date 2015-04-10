@@ -122,7 +122,8 @@
   }
 
   function changeRoute(name) {
-    document.getElementById("dropdown-main").innerText = name;
+    $("#dropdown-main").text(name);
+    //document.getElementById("dropdown-main").innerText = name;
 
     $.ajax({
     url: 'http://127.0.0.1:3000/route-waypoints?route=' + name, 
