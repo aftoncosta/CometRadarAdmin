@@ -368,15 +368,15 @@ function updateMap(){
 		        	case "10": hourlyCounts[2]++; break;
 		        	case "11": hourlyCounts[3]++; break;
 		        	case "12": hourlyCounts[4]++; break;
-		        	case "01": hourlyCounts[5]++; break;
-		        	case "02": hourlyCounts[6]++; break;
-		        	case "03": hourlyCounts[7]++; break;
-		        	case "04": hourlyCounts[8]++; break;
-		        	case "05": hourlyCounts[9]++; break;
-		        	case "06": hourlyCounts[10]++; break;
-		        	case "07": hourlyCounts[11]++; break;
-		        	case "08": hourlyCounts[12]++; break;
-		        	case "09": hourlyCounts[13]++; break;
+		        	case "13": hourlyCounts[5]++; break;
+		        	case "14": hourlyCounts[6]++; break;
+		        	case "15": hourlyCounts[7]++; break;
+		        	case "16": hourlyCounts[8]++; break;
+		        	case "17": hourlyCounts[9]++; break;
+		        	case "18": hourlyCounts[10]++; break;
+		        	case "19": hourlyCounts[11]++; break;
+		        	case "20": hourlyCounts[12]++; break;
+		        	case "21": hourlyCounts[13]++; break;
 		        }
 		    }
 		    createHeatMap();
