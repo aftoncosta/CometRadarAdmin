@@ -32,10 +32,29 @@ function initialize() {
 
   google.maps.event.addListener(directionsDisplay, 'directions_changed', function() {
     computeTotalDistance(directionsDisplay.getDirections());
+   // displayWaypoints(directionsDisplay.directions);  
+
   });
 
   calcRoute();
 }
+
+function displayWaypoints(result) {  
+    for (var i = 0; i < markers.length; ++i) {  
+        markers[i].setMap(null);  
+    }  
+    markers = [];  
+    if (result.sf.waypoints) {  
+            for (var i = 0; i < result.sf.waypoints.length; ++i) {  
+                    var latitude = result.sf.waypoints[i].location.wa;  
+                    var longitude = result.sf.waypoints[i].location.ya;    
+                    markers.push(new google.maps.Marker({  
+                            position: new google.maps.LatLng(latitude, longitude),  
+                            map: map  
+                    }));  
+            }  
+    }  
+}  
 
 
 function USGSOverlay(bounds, image, map) {
@@ -177,6 +196,7 @@ function addRoute(){
     alert("Name already exists");
     return false;
   }
+  //console.log(directionsService.origin);
 /*
     var waypts = [];
       for(var i in data){
@@ -186,12 +206,36 @@ function addRoute(){
       }
       calcRoute(data[0].originLat, data[0].originLong, data[0].destLat, data[0].destLong, waypts);
       */
- 
+ // console.log("Origin: " + JSON.stringify(directionsDisplay.directions.tc.origin));
+  //console.log("Destination: " + JSON.stringify(directionsDisplay.directions.tc.destination));
+  //console.log("Waypoints: " + JSON.stringify(directionsDisplay.directions.tc.waypoints));
+
+  //k = latitide
+  //D = longitude
+  origin_lat = directionsDisplay.directions.tc.origin.k;
+  origin_long = directionsDisplay.directions.tc.origin.D;
+  dest_lat = directionsDisplay.directions.tc.destination.k;
+  dest_long = directionsDisplay.directions.tc.destination.D;
+  //directionsDisplay.directions.tc.waypoints[i].location.k
+  waypts = directionsDisplay.directions.tc.waypoints;
+  //console.log(origin_lat + origin_long + dest_lat + dest_long + waypts);
+  console.log(origin_lat.toString());
+
+
+  //console.log(directionsDisplay.directions.route[0].legs[0].via_waypoint);
   //Add Route to Database
   $.ajax({
-    url: 'http://127.0.0.1:3000/add-route?route=' + name, 
+    url: 'http://127.0.0.1:3000/add-route', 
     type: 'GET',
     dataType: 'json',
+    data: {
+        'route': name,
+        'origin_lat': origin_lat,
+        'origin_long' : origin_long,
+        'dest_lat' : dest_lat,
+        'dest_long' : dest_long,
+        'waypts' : waypts
+    },
     timeout: 5000,
     success: function(data) {
       alert(name + " Route added to Database");
