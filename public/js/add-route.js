@@ -32,6 +32,19 @@ function initialize() {
 
   google.maps.event.addListener(directionsDisplay, 'directions_changed', function() {
     computeTotalDistance(directionsDisplay.getDirections());
+
+    var originLat = directionsDisplay.getDirections().tc.origin.k;
+    var originLong = directionsDisplay.getDirections().tc.origin.D;
+    var destLat = directionsDisplay.getDirections().tc.destination.k;
+    var destLong = directionsDisplay.getDirections().tc.destination.D;
+    var waypointsLat = [];
+    var waypointsLong = [];
+    var wayArray = directionsDisplay.getDirections().tc.waypoints;
+    for ( var i in wayArray){
+      waypointsLat[i] = wayArray[i].location.k;
+      waypointsLong[i] = wayArray[i].location.D;
+    }
+    console.log(waypointsLat);
   });
 
   calcRoute();
@@ -119,6 +132,7 @@ function calcRoute() {
       directionsDisplay.setDirections(response);
     }
   });
+  
 }
 
 function computeTotalDistance(result) {
@@ -168,12 +182,14 @@ function addRoute(){
         }
     },
     error: function(jqXHR, textStatus, errorThrown) {
-        alert('error ' + textStatus + " " + errorThrown);
+        alert('error ' + textStatus + " " + errorThrown);    
+        if (exists) {
+          alert("Name already exists");
+          return false;
+        }
     }
-    if (exists) {
-      alert("Name already exists");
-      return false;
-    }
+  });
+
 /*
 +    var waypts = [];
 +      for(var i in data){
