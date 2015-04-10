@@ -131,10 +131,13 @@
     timeout: 5000,
     success: function(data) {
       var waypts = [];
+
       for(var i in data){
+          if(data[i].wp_lat != null){
             waypts.push({
                 location:new google.maps.LatLng(data[i].wp_lat, data[i].wp_long)
             });
+          }
       }
       calcRoute(data[0].originLat, data[0].originLong, data[0].destLat, data[0].destLong, waypts);
     },
