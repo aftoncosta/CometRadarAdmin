@@ -3,13 +3,17 @@ USGSOverlay.prototype = new google.maps.OverlayView();
 
 var map;
 var routeNames = [];
-var cabStatus = [];
+var cabStatusBool = [];
+var cabStatusString = [];
 var cabLat = [];
 var cabLong = [];
 var cabNumbers = [];
 var cabOccupancy = [];
 var cabDriver = [];
+var shiftStart = [];
+var shiftEnd = [];
 var markers = [];
+var images = [];
 
 
 // Initialize the map and the custom overlay.
@@ -35,6 +39,12 @@ function initialize() {
 
 function setMarkers() {
 
+  for (var i in markers) {
+    markers[i].setMap(null);
+  }
+  markers.length = 0;
+
+  images = [];
   // Image for on-duty cart
   var image_green = {
     url: '../img/cart_green.png',
@@ -62,52 +72,62 @@ function setMarkers() {
   // Add the markers to the map
   for (var item in routeNames){
     var isFull = false;
-    var image;
+    //var image;
 
-    if (!cabStatus[item]){
-      image = image_black;
-      cabStatus[item] = 'off duty';
+    if (!cabStatusBool[item]){
+      images[item] = image_black;
+      cabStatusString[item] = 'off duty';
     } else {
       if (isFull) {
-        image = image_red
-        cabStatus[item] = 'full';
+        images[item] = image_red
+        cabStatusString[item] = 'full';
       } else {
-        image = image_green
-        cabStatus[item] = 'on duty';
+        images[item] = image_green
+        cabStatusString[item] = 'on duty';
       }
     }
 
-    markers[item] = createMarkers(item, image);
+    markers[item] = createMarkers(item);
 
   }
 }
 
-function createMarkers(id, image){
+function createMarkers(id){
   var myLatLng = new google.maps.LatLng(cabLat[id], cabLong[id]);
+  //console.log(images);
+  //console.log(cabStatus);
 
   var marker = new google.maps.Marker({
         position: myLatLng,
         map: map,
-        icon: image,
+        icon: images[id],
         title: routeNames[id],
         zIndex: 3
   });
 
   google.maps.event.addListener(marker, 'click', function() {
-      var detailDiv = document.getElementById('cabDetails');
-      var riderCountDiv = document.getElementById('riderCounts');
 
+      parent.document.getElementById("cabDetails").innerHTML = "<b>Status:</b> " + cabStatusString[id] + "<br/>"
+                                                              + "<b>Route:</b> " + routeNames[id] + "<br/>"
+                                                              + "<b>Shuttle #:</b> " + cabNumbers[id] + "<br/>"
+                                                              + "<b>Current Occupancy:</b> " + cabOccupancy[id] + "<br/>";
 
-      parent.document.getElementById("cabDetails").innerHTML = "Status: " + cabStatus[id] + "<br/>"
-                                                              + "Route: " + routeNames[id] + "<br/>"
-                                                              + "Driver: " + cabDriver[id] + "<br/>"
-                                                              + "Current Occupancy: " + cabOccupancy[id] + "<br/>";
-
-      parent.document.getElementById("riderCounts").innerHTML = "Today: " + "<br/>"
-                                                              + "Last Hour: " + "<br/>";
-
+      parent.document.getElementById("driverDetails").innerHTML = "<b>Driver:</b> " + cabDriver[id] + "<br/>"
+                                                              + "<b>Shift start time:</b> " + formatAMPM(new Date(shiftStart[id])) + "<br/>"
+                                                              + "<b>Shift end time:</b> " + formatAMPM(new Date(shiftEnd[id])) + "<br/>";
   });
   return marker;
+}
+
+function formatAMPM(date) {
+  var hours = date.getHours();
+  var minutes = date.getMinutes();
+  var ampm = hours >= 12 ? 'pm' : 'am';
+  hours = hours % 12;
+  hours = hours ? hours : 12;
+  minutes = minutes < 10 ? '0'+minutes : minutes;
+  var strTime = hours + ':' + minutes + ' ' + ampm;
+  return strTime;
 }
 
 function USGSOverlay(bounds, image, map) {
@@ -179,27 +199,35 @@ USGSOverlay.prototype.onRemove = function() {
   this.div_ = null;
 };
 
-$.ajax({
-    url: 'http://127.0.0.1:3000/route-data',
-    type: 'GET',
-    dataType: 'json',
-    timeout: 5000,
-    success: function(data) {
-        cabsInfo = data;
-        for(var cab in data){
-          routeNames[cab]   = data[cab].route_name;
-          cabStatus[cab]    = data[cab].onduty;
-          cabLat[cab]       = data[cab].currentLat;
-          cabLong[cab]      = data[cab].currentLong;
-          cabNumbers[cab]   = data[cab].shuttle;
-          cabOccupancy[cab] = data[cab].students_on_shuttle;
-          cabDriver[cab]    = data[cab].fname + ' ' + data[cab].lname; 
-          setMarkers();
-        }
-    },
-    error: function(jqXHR, textStatus, errorThrown) {
-        alert('error ' + textStatus + " " + errorThrown);
-    }
-});
+
+var myAjaxCall = function() {
+  $.ajax({
+      url: 'http://127.0.0.1:3000/route-data',
+      type: 'GET',
+      dataType: 'json',
+      timeout: 5000,
+      success: function(data) {
+          cabsInfo = data;
+          for(var cab in data){
+            routeNames[cab]   = data[cab].route_name;
+            cabStatusBool[cab]= data[cab].onduty;
+            cabLat[cab]       = data[cab].currentLat;
+            cabLong[cab]      = data[cab].currentLong;
+            cabNumbers[cab]   = data[cab].shuttle;
+            cabOccupancy[cab] = data[cab].students_on_shuttle;
+            cabDriver[cab]    = data[cab].fname + ' ' + data[cab].lname; 
+            shiftStart[cab]   = data[cab].shiftstart_date;
+            shiftEnd[cab]     = data[cab].shiftend_date;
+            setMarkers();
+          }
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+          alert('error ' + textStatus + " " + errorThrown);
+      }
+  });
+}
+
+myAjaxCall(); // initial AJAX call
+window.setInterval('myAjaxCall()', 5000); // update data every 5 seconds
 
 google.maps.event.addDomListener(window, 'load', initialize);

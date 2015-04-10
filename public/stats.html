@@ -14,6 +14,28 @@
     <link href="css/dashboard.css" rel="stylesheet">
     <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 
+    <style>
+      html, body, #map-canvas {
+        height: 100%;
+        margin: 0px;
+        padding: 0px;
+        padding-top: 20px
+      }
+      #panel {
+        position: absolute;
+        bottom: 0px;
+        z-index: 5;
+        background-color: transparent;
+        padding: 10px;
+      }
+      #map-btn{
+        background-color: #008542;
+        color: #fff;
+      }
+    </style>
+
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization"></script>
+
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
@@ -58,27 +80,21 @@
       <div class="row">
         <div class="col-md-3 sidebar" >
           <ul class="nav nav-sidebar" >
-            <li class=" lead"><h3>Statistics</h3></li>
 
-            Select Route:<br/>
+            <br/>Select Route:<br/>
             <div class="btn-group">
               <button type="button" class="btn btn-default" id="dropdown-main">All</button>
               <button type="button" class="btn btn-default dropdown-toggle" id="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                 <span class="caret"></span>
                 <span class="sr-only">Toggle Dropdown</span>
               </button>
-              <ul class="dropdown-menu" role="menu">
-                <li><a href="#">McDermott Library</a></li>
-                <li><a href="#">University Commons</a></li>
-                <li><a href="#">University Village Phase 5 & 6</a></li>
-                <li><a href="#">University Village Phase 1 & 2</a></li>
-                <li><a href="#">Rutford Avenue North-South</a></li>
-              </ul>
+              <ul class="dropdown-menu" role="menu" id="route-list"></ul>
             </div>
 
             <br/><br/>
+            <p>Date: <input class="form-control" type="text" id="datepicker"></p>
 
-            <p>Date: <input class="form-control" type="text" id="datepicker"></p><br>
+            <button type="button" class="btn button-style" onclick="updateMap()"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Update Map</button><br><br>
 
             <table class="table">
             <thead>
@@ -90,59 +106,59 @@
             <tbody>
               <tr>
                 <td scope="row">8-9am</td>
-                <td>10</td>
+                <td id="eight"></td>
               </tr>
               <tr>
                 <td scope="row">9-10am</td>
-                <td>23</td>
+                <td id="nine"></td>
               </tr>
               <tr>
                 <td scope="row">10-11am</td>
-                <td>35</td>
+                <td id="ten"></td>
               </tr>
               <tr>
                 <td scope="row">11am-12pm</td>
-                <td>67</td>
+                <td id="eleven"></td>
               </tr>
               <tr>
                 <td scope="row">12-1pm</td>
-                <td>75</td>
+                <td id="twelve"></td>
               </tr>
               <tr>
                 <td scope="row">1-2pm</td>
-                <td>70</td>
+                <td id="one"></td>
               </tr>
               <tr>
                 <td scope="row">2-3pm</td>
-                <td>73</td>
+                <td id="two"></td>
               </tr>
               <tr>
                 <td scope="row">3-4pm</td>
-                <td>65</td>
+                <td id="three"></td>
               </tr>
               <tr>
                 <td scope="row">4-5pm</td>
-                <td>43</td>
+                <td id="four"></td>
               </tr>
               <tr>
                 <td scope="row">5-6pm</td>
-                <td>32</td>
+                <td id="five"></td>
               </tr>
               <tr>
                 <td scope="row">6-7pm</td>
-                <td>26</td>
+                <td id="six"></td>
               </tr>
               <tr>
                 <td scope="row">7-8pm</td>
-                <td>20</td>
+                <td id="seven"></td>
               </tr>
               <tr>
                 <td scope="row">8-9pm</td>
-                <td>10</td>
+                <td id="eightPM"></td>
               </tr>
               <tr>
                 <td scope="row">9-10pm</td>
-                <td>13</td>
+                <td id="ninePM"</td>
               </tr>
             </tbody>
             </table>
@@ -150,7 +166,13 @@
           </ul>
         </div>
         <div class="col-md-9 col-md-offset-3 main" contentEditable="true">
-          <iframe class="map" frameBorder="0" scrolling="no" src="maps/stats-map.html"></iframe>
+          <div id="panel">
+          <button class="btn" id="map-btn" onclick="toggleHeatmap()">Toggle Heatmap</button>
+          <button class="btn" id="map-btn" onclick="changeGradient()">Change gradient</button>
+          <button class="btn" id="map-btn" onclick="changeRadius()">Change radius</button>
+          <button class="btn" id="map-btn" onclick="changeOpacity()">Change opacity</button>
+        </div>
+        <div id="map-canvas"></div>
         </div>
       </div>
     </div>
