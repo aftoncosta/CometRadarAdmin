@@ -58,16 +58,36 @@ app.get('/route-names', function (req, res) {
   });
 });
 
+// Get route names
+app.get('/stops', function (req, res) {
+  var route = req.query.route;
+  var date = req.query.date;
+  if (route == "All"){
+    connection.query('SELECT route_name, date, lat, bsxpccom_cometradar.routestops.long FROM bsxpccom_cometradar.routestops WHERE date >= "' + date + ' 00:00:00" AND date <= "' + date + ' 23:59:99";', function(err, rows, fields){
+      if (err) throw err;
+      for (var i in rows)
+        rows[i].date = rows[i].date.toString().substr(16, 2);
+      res.send(rows);
+    });
+  } else {
+    connection.query('SELECT route_name, date, lat, bsxpccom_cometradar.routestops.long FROM bsxpccom_cometradar.routestops WHERE route_name = "' + route + '" AND date >= "' + date + ' 00:00:00" AND date <= "' + date + ' 23:59:99";', function(err, rows, fields){
+      if (err) throw err;
+      for (var i in rows)
+        rows[i].date = rows[i].date.toString().substr(16, 2);
+      res.send(rows);
+    });
+  }
+});
+
 // Get route data (route name, shuttle#, occupancy, location coords, driver name, on/off duty)
 app.get('/route-data', function (req, res) {
   
-  connection.query('SELECT route_name, shuttle, students_on_shuttle, currentLat, currentLong, fname, lname, onduty FROM (SELECT bsxpccom_cometradar.current_route.*, bsxpccom_cometradar.users.fname, bsxpccom_cometradar.users.lname FROM bsxpccom_cometradar.current_route INNER JOIN users ON bsxpccom_cometradar.current_route.email = bsxpccom_cometradar.users.email) a JOIN (SELECT bsxpccom_cometradar.routedata.onduty, bsxpccom_cometradar.routedata.email FROM bsxpccom_cometradar.routedata) b ON a.email = b.email;', 
+  connection.query('SELECT route_name, shuttle, students_on_shuttle, currentLat, currentLong, fname, lname, shiftstart_date, shiftend_date, onduty FROM (SELECT bsxpccom_cometradar.current_route.*, bsxpccom_cometradar.users.fname, bsxpccom_cometradar.users.lname FROM bsxpccom_cometradar.current_route INNER JOIN users ON bsxpccom_cometradar.current_route.email = bsxpccom_cometradar.users.email) a JOIN (SELECT bsxpccom_cometradar.routedata.shiftend_date, bsxpccom_cometradar.routedata.shiftstart_date, bsxpccom_cometradar.routedata.onduty, bsxpccom_cometradar.routedata.email FROM bsxpccom_cometradar.routedata) b ON a.email = b.email;', 
     function(err, rows, fields){
       if (err) throw err;
       res.send(rows);
-      console.log(rows);
     });
 });
 
 app.listen(port);
-console.log('Example app listening at %s', port);
+console.log('App listening at %s', port);

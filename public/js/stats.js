@@ -1,20 +1,19 @@
 // Initalize jQuery Datepicker
 $(function() {
-	$( "#datepicker" ).datepicker();
+	$( "#datepicker" ).datepicker({
+		dateFormat: 'mm/dd/yy'
+	});
+	$('#datepicker').datepicker().datepicker('setDate',new Date());
 });
       
-var myDate = new Date();
-var prettyDate =(myDate.getMonth()+1) + '/' + myDate.getDate() + '/' + myDate.getFullYear();
-$("#datepicker").val(prettyDate);
-
 
 
 USGSOverlay.prototype = new google.maps.OverlayView();
 
-var overlay, map, pointarray, heatmap;
+var overlay, map, pointarray, heatmap, init = false, routeName = "All", date;
 
 // Dummy data for heatmap
-var cabData = [
+var cabData = [/*
 	new google.maps.LatLng(32.980800, -96.750678),
 	new google.maps.LatLng(32.980800, -96.750950),
 	new google.maps.LatLng(32.980800, -96.750900),
@@ -188,11 +187,18 @@ var cabData = [
 	new google.maps.LatLng(32.990698, -96.753989),
 	new google.maps.LatLng(32.990698, -96.754189),
 	new google.maps.LatLng(32.990698, -96.754389),
-	new google.maps.LatLng(32.990698, -96.752089)
+	new google.maps.LatLng(32.990698, -96.752089)*/
 ];
 
 // Initialize the map and the custom overlay.
 function initialize() {
+	
+	createMap();
+	updateMap();
+	//createHeatMap();
+}
+
+function createMap(){
 	var mapOptions = {
 	  zoom: 16,
 	  center: new google.maps.LatLng(32.985700, -96.750114),
@@ -209,10 +215,15 @@ function initialize() {
 	// The custom USGSOverlay object contains the USGS image,
 	// the bounds of the image, and a reference to the map.
 	overlay = new USGSOverlay(bounds, srcImage, map);
+}
 
+function createHeatMap(){
 	// create heatmap
+	//cabData = [];
+	//heatmap.setData(new google.maps.MVCArray(cabData));
+	//toggleHeatmap();
+	var pointArray = heatmap = null;
 	var pointArray = new google.maps.MVCArray(cabData);
-
 	heatmap = new google.maps.visualization.HeatmapLayer({
 	  data: pointArray
 	});
@@ -322,5 +333,82 @@ function changeRadius() {
 function changeOpacity() {
 	heatmap.set('opacity', heatmap.get('opacity') ? null : 0.2);
 }
+
+function changeRoute(name) {
+	routeName = name;
+	document.getElementById("dropdown-main").innerText = routeName;
+}
+
+function updateMap(){
+
+	var hourlyCounts = [0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+	var hourlyDivs = ["eight", "nine", "ten", "eleven", "twelve", "one", "two", "three", "four", "five", "six", "seven", "eightPM", "ninePM"];
+	date = $("#datepicker").datepicker('getDate');
+	date = date.toISOString().slice(0, 10).replace('T', ' ');
+
+
+	$.ajax({
+		url: 'http://127.0.0.1:3000/stops?route=' + routeName + '&date=' + date,
+		type: 'GET',
+		dataType: 'json',
+		timeout: 5000,
+		success: function(data) {
+			cabData = [];	
+			if(init)
+				toggleHeatmap();
+			else
+				init = true;
+					
+		    for(var i in data){
+		        cabData[i] = new google.maps.LatLng(data[i].lat, data[i].long);
+		        console.log(data[i].date);
+		        switch(data[i].date){
+		        	case "08": hourlyCounts[0]++; break;
+		        	case "09": hourlyCounts[1]++; break;
+		        	case "10": hourlyCounts[2]++; break;
+		        	case "11": hourlyCounts[3]++; break;
+		        	case "12": hourlyCounts[4]++; break;
+		        	case "01": hourlyCounts[5]++; break;
+		        	case "02": hourlyCounts[6]++; break;
+		        	case "03": hourlyCounts[7]++; break;
+		        	case "04": hourlyCounts[8]++; break;
+		        	case "05": hourlyCounts[9]++; break;
+		        	case "06": hourlyCounts[10]++; break;
+		        	case "07": hourlyCounts[11]++; break;
+		        	case "08": hourlyCounts[12]++; break;
+		        	case "09": hourlyCounts[13]++; break;
+		        }
+		    }
+		    createHeatMap();
+		    for (var h in hourlyCounts){
+		    	document.getElementById(hourlyDivs[h]).innerText = hourlyCounts[h];
+		    }
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+		    alert('error ' + textStatus + " " + errorThrown);
+		}
+	});
+}
+
+$.ajax({
+	url: 'http://127.0.0.1:3000/route-names',
+	type: 'GET',
+	dataType: 'json',
+	timeout: 5000,
+	success: function(data) {
+
+		document.getElementById("route-list").innerHTML = '<li><a onclick="changeRoute(' + "'All'" + ')">All</a></li>';
+	    
+	    for(var i in data){
+	        document.getElementById("route-list").innerHTML = document.getElementById("route-list").innerHTML 
+	                                                        + '<li><a onclick="changeRoute(' + "'" 
+	                                                        + data[i].route_name + "'" + ')">'
+	                                                        + data[i].route_name + '</a></li>';
+	    }
+	},
+	error: function(jqXHR, textStatus, errorThrown) {
+	    alert('error ' + textStatus + " " + errorThrown);
+	}
+});
 
 google.maps.event.addDomListener(window, 'load', initialize);
