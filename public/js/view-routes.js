@@ -50,7 +50,7 @@
 
     // Explicitly call setMap on this overlay.
     this.setMap(map);
-    calcRoute()
+    //calcRoute()
   }
   
 
@@ -106,13 +106,12 @@
     this.div_ = null;
   };
 
-  function calcRoute() {
+  function calcRoute(olat, olong, dlat, dlong, wp) {
 
     var request = {
-      origin: new google.maps.LatLng(32.9856748, -96.75524339999998),
-      destination: new google.maps.LatLng(32.9855582, -96.7499986),
-      waypoints:[{location: new google.maps.LatLng(32.9837381, -96.7544246)}, {location: new google.maps.LatLng(32.9837774, -96.75588640000001)}, 
-                  {location: new google.maps.LatLng(32.9855606, -96.75002030000002)}, {location: new google.maps.LatLng(32.9856448, -96.74969579999998)}],
+      origin: new google.maps.LatLng(olat, olong),
+      destination: new google.maps.LatLng(dlat, dlong),
+      waypoints: wp,
       travelMode: google.maps.TravelMode.DRIVING
     };
     directionsService.route(request, function(response, status) {
@@ -123,7 +122,27 @@
   }
 
   function changeRoute(name) {
-    console.log('change ' + name);
+    document.getElementById("dropdown-main").innerText = name;
+
+    $.ajax({
+    url: 'http://127.0.0.1:3000/route-waypoints?route=' + name, 
+    type: 'GET',
+    dataType: 'json',
+    timeout: 5000,
+    success: function(data) {
+      var waypts = [];
+      for(var i in data){
+            waypts.push({
+                location:new google.maps.LatLng(data[i].wp_lat, data[i].wp_long)
+            });
+      }
+      calcRoute(data[0].originLat, data[0].originLong, data[0].destLat, data[0].destLong, waypts);
+    },
+
+    error: function(jqXHR, textStatus, errorThrown) {
+        alert('error ' + textStatus + " " + errorThrown);
+    }
+  });
     
   }
 
@@ -141,10 +160,11 @@
         
         for(var i in data){
             document.getElementById("route-list").innerHTML = document.getElementById("route-list").innerHTML 
-                                                            + '<li><a href="#" onclick="changeRoute(' + "'" 
+                                                            + '<li><a onclick="changeRoute(' + "'" 
                                                             + data[i].route_name + "'" + ')">'
                                                             + data[i].route_name + '</a></li>';
         }
+        changeRoute(data[0].route_name);
     },
     error: function(jqXHR, textStatus, errorThrown) {
         alert('error ' + textStatus + " " + errorThrown);

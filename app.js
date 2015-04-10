@@ -27,22 +27,19 @@ app.use(express.static(__dirname + "/public"));
 app.get('/add-route', function (req, res) {
   
   name = req.query.route;
- // console.log("inside app.js: " + name);
   origin_lat = req.query.origin_lat;
   origin_long = req.query.origin_long;
   dest_lat = req.query.dest_lat;
   dest_long = req.query.dest_long;
-  waypts = req.query.waypts;
-  
-  console.log(origin_lat);
-  var rows_stored = '';
+  wayptsLat = req.query.wayptsLat;
+  wayptsLong = req.query.wayptsLong;
 
   connection.query('INSERT INTO bsxpccom_cometradar.routes VALUES ("' + name + '","' + origin_lat + '","' + origin_long + '","' + dest_lat + '","' + dest_long + '");', function(err, rows, fields){
     if (err) throw err;
 
-    if(waypts != null){
-      for(var i in waypts){
-        connection.query('INSERT INTO bsxpccom_cometradar.route_waypoints VALUES ("' + name + '","' + i + '","' + waypoints[i].location.k + '","' + waypoints[i].location.D + '");', function(err, rows, fields){
+    if(wayptsLat != null){
+      for(var i in wayptsLat){
+        connection.query('INSERT INTO bsxpccom_cometradar.route_waypoints VALUES ("' + name + '","' + i + '","' + wayptsLat[i] + '","' + wayptsLong[i] + '");', function(err, rows, fields){
         if (err) throw err;
         });
       }
@@ -56,7 +53,7 @@ app.get('/add-route', function (req, res) {
 app.get('/route-waypoints', function (req, res) {
   route = req.query.route;
 
-  connection.query('SELECT rt.*, wp.order, wp.wp_long, wp.wp_lat FROM bsxpccom_cometradar.route_waypoints AS wp RIGHT JOIN bsxpccom_cometradar.routes AS rt ON rt.route_name = wp.route_name WHERE rt.route_name = "' + route + '";', function(err, rows, fields){
+  connection.query('SELECT rt.*, wp.order, wp.wp_long, wp.wp_lat FROM bsxpccom_cometradar.route_waypoints AS wp RIGHT JOIN bsxpccom_cometradar.routes AS rt ON rt.route_name = wp.route_name WHERE rt.route_name = "' + route + '" ORDER BY wp.order;', function(err, rows, fields){
     if (err) throw err;
     res.send(rows);
   });
