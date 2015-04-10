@@ -134,34 +134,69 @@ function computeTotalDistance(result) {
 
 google.maps.event.addDomListener(window, 'load', initialize);
 
-var jq = document.createElement('script');
-jq.src = "//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js";
-document.querySelector('head').appendChild(jq);
+function inputClick(){
+  var name = document.getElementById("name").value;
+  var def = 'Route name';
+  if(name.toLowerCase() == def.toLowerCase()){
+   document.getElementById("name").value = ''; 
+  }
+}
 
-jq.onload = procede;//DON'T TYPE PARENTHESIS
-
-//i.e. 'procede()' runs instantly and assigns return value to jq.onload
-//     'procede' gives it a function to run when it's ready (what you want)
-
-
-function procede()
-{
-  $.ajaxPrefilter( "json script", function( options ) {
-  options.crossDomain = true;
-  });
-//jQuery commands are loaded (do your magic)
- // var ip = '104.154.90.207:3000';
-  //route = ip + '/api/getRoutes'
-  var ip = 'localhost:3000';
-
-
-  $.get( '/route-names', function(data) {
- //$('#results').html(data);
-  console.log('TESTING');
-  console.log(data);
-
-  });
-
-
-
+function addRoute(){
+  var name = document.getElementById("name").value;
+  console.log(name);
+ 
+  //Check for empty name
+  if (name == null || name == "" || name == 'Route name') {
+    alert("Route Name must be filled out");
+    return false;
+  }
+  var exists = false;
+  //Check to see if name already exists
+  $.ajax({
+    url: 'http://127.0.0.1:3000/route-names',
+    type: 'GET',
+    dataType: 'json',
+    async: false,
+    timeout: 5000,
+    success: function(data) {
+        
+        for(var i in data){
+            if(name.toLowerCase() == (data[i].route_name).toLowerCase()){
+              exists = true;
+            }        
+        }
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+        alert('error ' + textStatus + " " + errorThrown);
+    }
+    if (exists) {
+      alert("Name already exists");
+      return false;
+    }
+/*
++    var waypts = [];
++      for(var i in data){
++            waypts.push({
++                location:new google.maps.LatLng(data[i].wp_lat, data[i].wp_long)
++            });
++      }
++      calcRoute(data[0].originLat, data[0].originLong, data[0].destLat, data[0].destLong, waypts);
++      */
+ 
+  //Add Route to Database
+  $.ajax({
+    url: 'http://127.0.0.1:3000/add-route?route=' + name, 
+    type: 'GET',
+    dataType: 'json',
+    timeout: 5000,
+    success: function(data) {
+      alert(name + " Route added to Database");
+      return false;
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+            alert('error ' + textStatus + " " + errorThrown);
+      }
+   });
+  
 }
