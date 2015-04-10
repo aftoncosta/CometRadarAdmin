@@ -1,5 +1,6 @@
 var express = require('express');
 var app = express();
+var server = express();
 var port    = parseInt(process.env.PORT, 10) || 3000;
 var mysql      = require('mysql');
 var connection = mysql.createConnection({
@@ -22,6 +23,48 @@ app.use(function(req, res, next) {
   next();
 });
 app.use(express.static(__dirname + "/public"));
+
+
+server.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
+
+
+//SOCKET TEST
+var ws = require("nodejs-websocket")
+
+
+
+server.get('/sendPickup', function(req, res){
+    var query= req.query.string;
+    ws.createServer(function (conn) {
+    console.log("New connection")
+    conn.on("text", function (str) {
+        console.log("Received "+str)
+        conn.sendText(str.toUpperCase()+"!!!")
+    })
+    conn.on("close", function (code, reason) {
+        console.log("Connection closed")
+    })
+  });
+    //connection.query(query);
+        res.send("hello bitches: url received");
+});
+
+server.listen(3001)
+
+// /run-query?query=DELETE FROM blah blah
+//app.get('/run-query'), function (req, res){
+ // var query = req.query.query;
+//  connection.query(query);
+//});
+
+
+
+
 
 //Add a route to the database
 app.get('/add-route', function (req, res) {
@@ -98,18 +141,16 @@ app.get('/route-names', function (req, res) {
 // Get route names
 app.get('/stops', function (req, res) {
   var route = req.query.route;
-  var startDate = req.query.startDate;
-  var endDate = req.query.endDate;
-
+  var date = req.query.date;
   if (route == "All"){
-    connection.query('SELECT route_name, date, lat, bsxpccom_cometradar.routestops.long FROM bsxpccom_cometradar.routestops WHERE date >= "' + startDate + ' 00:00:00" AND date <= "' + endDate + ' 23:59:99";', function(err, rows, fields){
+    connection.query('SELECT route_name, date, lat, bsxpccom_cometradar.routestops.long FROM bsxpccom_cometradar.routestops WHERE date >= "' + date + ' 00:00:00" AND date <= "' + date + ' 23:59:99";', function(err, rows, fields){
       if (err) throw err;
       for (var i in rows)
         rows[i].date = rows[i].date.toString().substr(16, 2);
       res.send(rows);
     });
   } else {
-    connection.query('SELECT route_name, date, lat, bsxpccom_cometradar.routestops.long FROM bsxpccom_cometradar.routestops WHERE route_name = "' + route + '" AND date >= "' + startDate + ' 00:00:00" AND date <= "' + endDate + ' 23:59:99";', function(err, rows, fields){
+    connection.query('SELECT route_name, date, lat, bsxpccom_cometradar.routestops.long FROM bsxpccom_cometradar.routestops WHERE route_name = "' + route + '" AND date >= "' + date + ' 00:00:00" AND date <= "' + date + ' 23:59:99";', function(err, rows, fields){
       if (err) throw err;
       for (var i in rows)
         rows[i].date = rows[i].date.toString().substr(16, 2);
