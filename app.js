@@ -24,7 +24,6 @@ app.use(function(req, res, next) {
 });
 app.use(express.static(__dirname + "/public"));
 
-
 server.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -33,34 +32,18 @@ server.use(function(req, res, next) {
 
 
 
-//SOCKET TEST
-var ws = require("nodejs-websocket")
 
-
-
+// RIDER APP SERVER
 server.get('/sendPickup', function(req, res){
-    var query= req.query.string;
-    ws.createServer(function (conn) {
-    console.log("New connection")
-    conn.on("text", function (str) {
-        console.log("Received "+str)
-        conn.sendText(str.toUpperCase()+"!!!")
-    })
-    conn.on("close", function (code, reason) {
-        console.log("Connection closed")
-    })
-  });
-    //connection.query(query);
-        res.send("hello bitches: url received");
+    var query = req.query.string; // store the part of the URL that comes after ?string= ... we send this in the android app
+    connection.query(query, function(err, rows, fields){  // calls the query
+      if (err) throw err;
+      res.send(rows);   // sends the response data (in JSON format) back to android. You can also check the response at localhost:3001/sendPickup?string=YOUR QUERY HERE
+                        // for INSERT commands, it just returns the number of rows changed and some other useless crap
+                        // but for SELECT commands, it'll return the DB rows in JSON format. Look at localhost:3000/route-names as an example
+    });
 });
-
 server.listen(3001)
-
-// /run-query?query=DELETE FROM blah blah
-//app.get('/run-query'), function (req, res){
- // var query = req.query.query;
-//  connection.query(query);
-//});
 
 
 
