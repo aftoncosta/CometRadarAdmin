@@ -34,7 +34,7 @@ server.use(function(req, res, next) {
 
 
 // RIDER APP SERVER
-server.get('/sendPickup', function(req, res){
+app.get('/doQuery', function(req, res){
     var query = req.query.string; // store the part of the URL that comes after ?string= ... we send this in the android app
     connection.query(query, function(err, rows, fields){  // calls the query
       if (err) throw err;
@@ -43,7 +43,7 @@ server.get('/sendPickup', function(req, res){
                         // but for SELECT commands, it'll return the DB rows in JSON format. Look at localhost:3000/route-names as an example
     });
 });
-server.listen(3001)
+//server.listen(3001)
 
 
 
