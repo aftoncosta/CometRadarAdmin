@@ -180,7 +180,6 @@ function updateMap(){
 		url: 'http://127.0.0.1:3000/stops?route=' + routeName + '&startDate=' + startDate + '&endDate=' + endDate,
 		type: 'GET',
 		dataType: 'json',
-		timeout: 5000,
 		success: function(data) {
 			cabData = [];	
 			if(init)
@@ -214,7 +213,7 @@ function updateMap(){
 		    }
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
-		    alert('error ' + textStatus + " " + errorThrown);
+		    alert('/stops error ' + textStatus + " " + errorThrown);
 		}
 	});
 }
@@ -223,7 +222,6 @@ $.ajax({
 	url: 'http://127.0.0.1:3000/route-names',
 	type: 'GET',
 	dataType: 'json',
-	timeout: 5000,
 	success: function(data) {
 
 		document.getElementById("route-list").innerHTML = '<li><a onclick="changeRoute(' + "'All'" + ')">All</a></li>';
@@ -236,7 +234,7 @@ $.ajax({
 	    }
 	},
 	error: function(jqXHR, textStatus, errorThrown) {
-	    alert('error ' + textStatus + " " + errorThrown);
+	    alert('/route-names error ' + textStatus + " " + errorThrown);
 	}
 });
 

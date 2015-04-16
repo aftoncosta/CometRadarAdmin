@@ -204,7 +204,6 @@ var myAjaxCall = function() {
       url: 'http://127.0.0.1:3000/route-data',
       type: 'GET',
       dataType: 'json',
-      timeout: 5000,
       success: function(data) {
           cabsInfo = data;
           for(var cab in data){
@@ -221,13 +220,10 @@ var myAjaxCall = function() {
             setMarkers();
           }
       },
-      error: function(jqXHR, textStatus, errorThrown) {
-          alert('error ' + textStatus + " " + errorThrown);
-      }
   });
 }
 
 myAjaxCall(); // initial AJAX call
-window.setInterval('myAjaxCall()', 5000); // update data every 5 seconds
+window.setInterval('myAjaxCall()', 8000); // update data every 5 seconds
 
 google.maps.event.addDomListener(window, 'load', initialize);

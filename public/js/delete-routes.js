@@ -2,7 +2,6 @@ $.ajax({
     url: 'http://127.0.0.1:3000/route-names',
     type: 'GET',
     dataType: 'json',
-    timeout: 5000,
     success: function(data) { 
         for(var i in data){
             document.getElementById("route-list").innerHTML = document.getElementById("route-list").innerHTML 
@@ -22,7 +21,6 @@ function deleteRoute(name){
         url: 'http://127.0.0.1:3000/delete-route?route=' + name,    // Pass route name here through a query
         type: 'GET',
         dataType: 'json',
-        timeout: 5000,
         success: function(data) { 
             document.getElementById("route-list").innerHTML = '';
             for(var i in data){

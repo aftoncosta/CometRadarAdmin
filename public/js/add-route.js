@@ -157,7 +157,6 @@ function addRoute(){
     type: 'GET',
     dataType: 'json',
     async: false,
-    timeout: 5000,
     success: function(data) {
         
         for(var i in data){
@@ -182,13 +181,14 @@ function addRoute(){
 
   //k = latitide
   //D = longitude
-  origin_lat = directionsDisplay.directions.tc.origin.k;
-  origin_long = directionsDisplay.directions.tc.origin.D;
-  dest_lat = directionsDisplay.directions.tc.destination.k;
-  dest_long = directionsDisplay.directions.tc.destination.D;
+  console.log(directionsDisplay);
+  origin_lat = directionsDisplay.directions.request.origin.k;
+  origin_long = directionsDisplay.directions.request.origin.D;
+  dest_lat = directionsDisplay.directions.request.destination.k;
+  dest_long = directionsDisplay.directions.request.destination.D;
   var waypointsLat = [];
   var waypointsLong = [];
-  var wayArray = directionsDisplay.getDirections().tc.waypoints;
+  var wayArray = directionsDisplay.getDirections().waypoints;
   for ( var i in wayArray){
       waypointsLat[i] = wayArray[i].location.k;
       waypointsLong[i] = wayArray[i].location.D;
@@ -208,7 +208,6 @@ function addRoute(){
         'wayptsLat' : waypointsLat,
         'wayptsLong' : waypointsLong
     },
-    timeout: 5000,
     success: function(data) {
       alert(name + " Route added to Database");
       return false;
