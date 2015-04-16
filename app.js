@@ -251,7 +251,7 @@ app.get('/api/getRiderLocations', function (req, res) {
 
 //TODO move behind login wall
 app.get('/api/getRoute', function (req, res) {
-  connection.query('SELECT r.order, r.wp_lat AS lat, r.wp_long AS long FROM `route_waypoints` as r WHERE ROUTE_NAME=\'' + req.query.rname + '\' ORDER BY r.order ASC', function (error, results, fields) {
+  connection.query('SELECT r.order, r.wp_lat AS lat, r.wp_long AS \'long\' FROM `route_waypoints` as r WHERE ROUTE_NAME=\'' + req.query.rname + '\' ORDER BY r.order ASC', function (error, results, fields) {
     console.log('Error: ' + error);
     res.send(results);
   }); 
