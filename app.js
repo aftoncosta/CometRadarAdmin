@@ -92,37 +92,25 @@ function ensureAuthenticated(req, res, next) {
   res.redirect('/');
 }
 
-var connection = mysql.createConnection({
-  host     : '69.195.124.139',
-  user     : 'bsxpccom_teamX',
-  password : 'C$1RFKqdCr&w',
-  database : 'bsxpccom_cometradar'
-});
 
-connection.connect(function(err) {
-    if (err) {
-      console.error('error connecting: ' + err.stack);
-      return;
-    }
-    console.log('connected as id ' + connection.threadId);
-	});
-
-// Allows cross-domain calls
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
 app.use(express.static(__dirname + "/public"));
 
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
 
 // RIDER APP app
 app.get('/doQuery', function(req, res){
+    var connection = mysql.createConnection({
+      host     : '69.195.124.139',
+      user     : 'bsxpccom_teamX',
+      password : 'C$1RFKqdCr&w',
+      database : 'bsxpccom_cometradar'
+    });
+
+    connection.connect(function(err){
+      if (err){
+          console.log('DB Connection error');
+      }
+    });
+
     var query = req.query.string; // store the part of the URL that comes after ?string= ... we send this in the android app
     connection.query(query, function(err, rows, fields){  // calls the query
     
@@ -131,12 +119,24 @@ app.get('/doQuery', function(req, res){
                         // for INSERT commands, it just returns the number of rows changed and some other useless crap
                         // but for SELECT commands, it'll return the DB rows in JSON format. Look at localhost:3000/route-names as an example
     });
+    connection.end();
 });
-//app.listen(3001)
-
 
 //Add a route to the database
 app.get('/add-route', function (req, res) {
+  var connection = mysql.createConnection({
+    host     : '69.195.124.139',
+    user     : 'bsxpccom_teamX',
+    password : 'C$1RFKqdCr&w',
+    database : 'bsxpccom_cometradar'
+  });
+
+  connection.connect(function(err){
+    if (err){
+        console.log('DB Connection error');
+    }
+  });
+  
   name = req.query.route;
   origin_lat = req.query.origin_lat;
   origin_long = req.query.origin_long;
@@ -157,20 +157,49 @@ app.get('/add-route', function (req, res) {
     }
     res.send(rows);
   });
+  
+  connection.end();
 });
 
 //Gets a route's waypoints
 app.get('/route-waypoints', function (req, res) {
+  var connection = mysql.createConnection({
+    host     : '69.195.124.139',
+    user     : 'bsxpccom_teamX',
+    password : 'C$1RFKqdCr&w',
+    database : 'bsxpccom_cometradar'
+  });
+
+  connection.connect(function(err){
+    if (err){
+        console.log('DB Connection error');
+    }
+  });
+
   route = req.query.route;
 
   connection.query('SELECT rt.*, wp.order, wp.wp_long, wp.wp_lat FROM bsxpccom_cometradar.route_waypoints AS wp RIGHT JOIN bsxpccom_cometradar.routes AS rt ON rt.route_name = wp.route_name WHERE rt.route_name = "' + route + '" ORDER BY wp.order;', function(err, rows, fields){
     if (err) throw err;
     res.send(rows);
   });
+
+  connection.end();
 });
 
 // Deletes a route
 app.get('/delete-route', function (req, res) {
+  var connection = mysql.createConnection({
+    host     : '69.195.124.139',
+    user     : 'bsxpccom_teamX',
+    password : 'C$1RFKqdCr&w',
+    database : 'bsxpccom_cometradar'
+  });
+
+  connection.connect(function(err){
+    if (err){
+        console.log('DB Connection error');
+    }
+  });
   route = req.query.route;
 
   // Delete the route from ROUTEDATA
@@ -193,21 +222,45 @@ app.get('/delete-route', function (req, res) {
     if (err) throw err;
     res.send(rows);
   });
-
+  connection.end();
 });
 
 // Get route names
 app.get('/route-names', function (req, res) {
+  var connection = mysql.createConnection({
+    host     : '69.195.124.139',
+    user     : 'bsxpccom_teamX',
+    password : 'C$1RFKqdCr&w',
+    database : 'bsxpccom_cometradar'
+  });
+
+  connection.connect(function(err){
+    if (err){
+        console.log('DB Connection error');
+    }
+  });
   
   connection.query('SELECT route_name FROM bsxpccom_cometradar.routes;', function(err, rows, fields){
     if (err) throw err;
     res.send(rows);
   });
-
+  connection.end();
 });
 
 // Get route names
 app.get('/stops', function (req, res) {
+  var connection = mysql.createConnection({
+    host     : '69.195.124.139',
+    user     : 'bsxpccom_teamX',
+    password : 'C$1RFKqdCr&w',
+    database : 'bsxpccom_cometradar'
+  });
+
+  connection.connect(function(err){
+    if (err){
+        console.log('DB Connection error');
+    }
+  });
 
   var route = req.query.route;
   var startDate = req.query.startDate;
@@ -228,42 +281,105 @@ app.get('/stops', function (req, res) {
       res.send(rows);
     });
   }
+  connection.end();
 });
 
-// Get route data (route name, shuttle#, occupancy, location coords, driver name, on/off duty)
+// Get route data (route name, shuttle#, current occupancy,, max occupancy, location coords, driver name, on/off duty)
 app.get('/route-data', function (req, res) {
-  connection.query('SELECT route_name, shuttle, students_on_shuttle, currentLat, currentLong, fname, lname, shiftstart_date, shiftend_date, onduty FROM (SELECT bsxpccom_cometradar.current_route.*, bsxpccom_cometradar.users.fname, bsxpccom_cometradar.users.lname FROM bsxpccom_cometradar.current_route INNER JOIN users ON bsxpccom_cometradar.current_route.email = bsxpccom_cometradar.users.email) a JOIN (SELECT bsxpccom_cometradar.routedata.shiftend_date, bsxpccom_cometradar.routedata.shiftstart_date, bsxpccom_cometradar.routedata.onduty, bsxpccom_cometradar.routedata.email FROM bsxpccom_cometradar.routedata) b ON a.email = b.email;', 
+  var connection = mysql.createConnection({
+    host     : '69.195.124.139',
+    user     : 'bsxpccom_teamX',
+    password : 'C$1RFKqdCr&w',
+    database : 'bsxpccom_cometradar'
+  });
+
+  connection.connect(function(err){
+    if (err){
+        console.log('DB Connection error');
+    }
+  });
+
+  connection.query('SELECT route_name, a.shuttle, students_on_shuttle, max, shiftstart_date, shiftend_date, currentLat, currentLong, fname, lname, onduty FROM (SELECT bsxpccom_cometradar.current_route.*, bsxpccom_cometradar.users.fname, bsxpccom_cometradar.users.lname FROM bsxpccom_cometradar.current_route INNER JOIN users ON bsxpccom_cometradar.current_route.email = bsxpccom_cometradar.users.email) a JOIN (SELECT bsxpccom_cometradar.routedata.onduty, bsxpccom_cometradar.routedata.email, bsxpccom_cometradar.routedata.shiftstart_date, bsxpccom_cometradar.routedata.shiftend_date, bsxpccom_cometradar.shuttle.max, bsxpccom_cometradar.shuttle.shuttle FROM bsxpccom_cometradar.routedata INNER JOIN shuttle ON bsxpccom_cometradar.routedata.shuttle = bsxpccom_cometradar.shuttle.shuttle) b ON a.email = b.email AND a.shuttle = b.shuttle;',
     function(err, rows, fields){
       if (err) throw err;
       res.send(rows);
     });
+  connection.end();
 });
 
 //DRIVER APP
 //TODO move behind login wall
 app.get('/api/getRiderLocations', function (req, res) {
+  var connection = mysql.createConnection({
+    host     : '69.195.124.139',
+    user     : 'bsxpccom_teamX',
+    password : 'C$1RFKqdCr&w',
+    database : 'bsxpccom_cometradar'
+  });
+
+  connection.connect(function(err) {
+    if (err) {
+      console.error('error connecting: ' + err.stack);
+      return;
+    }
+    console.log('connected as id ' + connection.threadId);
+  });
+
   //TODO add date to query
   connection.query('SELECT pr.lat, pr.long FROM `pickup_request` AS pr WHERE ROUTE_NAME=\'' + req.query.rname + '\'', function (error, results, fields) {
     console.log('Error: ' + error);
     res.send(results);
   }); 
+  connection.end();
 });
 
 //TODO move behind login wall
 app.get('/api/getRoute', function (req, res) {
+  var connection = mysql.createConnection({
+    host     : '69.195.124.139',
+    user     : 'bsxpccom_teamX',
+    password : 'C$1RFKqdCr&w',
+    database : 'bsxpccom_cometradar'
+  });
+
+  connection.connect(function(err) {
+    if (err) {
+      console.error('error connecting: ' + err.stack);
+      return;
+    }
+    console.log('connected as id ' + connection.threadId);
+  });
+
   connection.query('SELECT r.order, r.wp_lat AS lat, r.wp_long AS long FROM `route_waypoints` as r WHERE ROUTE_NAME=\'' + req.query.rname + '\' ORDER BY r.order ASC', function (error, results, fields) {
     console.log('Error: ' + error);
     res.send(results);
   }); 
+  connection.end();
 });
 
 //TODO move behind login wall
 app.get('/api/updateLocation', function (req, res) {
+  var connection = mysql.createConnection({
+    host     : '69.195.124.139',
+    user     : 'bsxpccom_teamX',
+    password : 'C$1RFKqdCr&w',
+    database : 'bsxpccom_cometradar'
+  });
+
+  connection.connect(function(err) {
+    if (err) {
+      console.error('error connecting: ' + err.stack);
+      return;
+    }
+    console.log('connected as id ' + connection.threadId);
+  });
+
   connection.query('UPDATE `current_route` SET currentLat=\'' + req.query.lat + '\',currentLong=\'' + req.query.long 
     + '\' WHERE route_name=\'' + req.query.rname + '\'', function (error, results, fields) {
     console.log('Error: ' + error);
     res.send(results);
-  }); 
+  });
+  connection.end(); 
 });
 
 app.get('/', function(req, res){

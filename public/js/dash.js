@@ -12,6 +12,7 @@ var cabOccupancy = [];
 var cabDriver = [];
 var shiftStart = [];
 var shiftEnd = [];
+var cabFull = [];
 var markers = [];
 var images = [];
 
@@ -71,7 +72,7 @@ function setMarkers() {
 
   // Add the markers to the map
   for (var item in routeNames){
-    var isFull = false;
+    var isFull = cabFull[item];
     //var image;
 
     if (!cabStatusBool[item]){
@@ -94,8 +95,6 @@ function setMarkers() {
 
 function createMarkers(id){
   var myLatLng = new google.maps.LatLng(cabLat[id], cabLong[id]);
-  //console.log(images);
-  //console.log(cabStatus);
 
   var marker = new google.maps.Marker({
         position: myLatLng,
@@ -218,6 +217,7 @@ var myAjaxCall = function() {
             cabDriver[cab]    = data[cab].fname + ' ' + data[cab].lname; 
             shiftStart[cab]   = data[cab].shiftstart_date;
             shiftEnd[cab]     = data[cab].shiftend_date;
+            cabFull[cab]      = (data[cab].students_on_shuttle >= data[cab].max) ? true : false;
             setMarkers();
           }
       },
