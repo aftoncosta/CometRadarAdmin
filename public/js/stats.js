@@ -190,7 +190,7 @@ function updateMap(){
 					
 		    for(var i in data){
 		        cabData[i] = new google.maps.LatLng(data[i].lat, data[i].long);
-		        console.log(data[i].date);
+
 		        switch(data[i].date){
 		        	case "08": hourlyCounts[0]++; break;
 		        	case "09": hourlyCounts[1]++; break;

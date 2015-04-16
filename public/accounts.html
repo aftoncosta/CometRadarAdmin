@@ -75,6 +75,11 @@
               <li><a href="#">Administrator</a></li>
             </ul>
           </div>
+          <br/><br/>
+          
+          <div id="uploadBtn" class="btn btn-default form-control form-center" onclick="getFile()">click to upload a user image</div>
+          <div style='height: 0px;width: 0px; overflow:hidden;'><input id="upfile" type="file" value="upload" accept=".tiff, .jpg, .jpeg, .png" onchange="sub(this)"/></div>
+
 
           <br/><br/>
           <button type="button" class="btn btn-default button-style"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add User</button>
@@ -109,5 +114,17 @@
     <script src="js/bootstrap.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="js/ie10-viewport-bug-workaround.js"></script>
+    <script>
+    function getFile(){
+        document.getElementById("upfile").click();
+    }
+    function sub(obj){
+      var file = obj.value;
+      var fileName = file.split("\\");
+      document.getElementById("uploadBtn").innerHTML = fileName[fileName.length-1];
+      document.myForm.submit();
+      event.preventDefault();
+    }
+    </script>
   </body>
 </html>
