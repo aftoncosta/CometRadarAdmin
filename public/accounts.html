@@ -57,11 +57,13 @@
       <div class="jumbotron text-center">
 
         <h2 class="lead">Add User</h2>
-          <input class="form-control form-center" type="text" value="Name" onclick="this.value=''"/><br/>
-        
-          <input class="form-control form-center" type="text" value="Email" onclick="this.value=''"/><br/>
+          <input class="form-control form-center" type="text" value="First Name" id='fname' onclick="inputClick('fname')"/><br/>
 
-          <input class="form-control form-center" type="text" value="Password" onclick="this.value=''"/><br/>
+          <input class="form-control form-center" type="text" value="Last Name" id='lname' onclick="inputClick('lname')"/><br/>
+        
+          <input class="form-control form-center" type="text" value="Email" id='email' onclick="inputClick('email')"/><br/>
+
+          <input class="form-control form-center" type="text" value="Password" id='pwd' onclick="inputClick('pwd')"/><br/>
 
 
           <div class="btn-group form-center">
@@ -70,9 +72,9 @@
               <span class="caret"></span>
               <span class="sr-only">Toggle Dropdown</span>
             </button>
-            <ul class="dropdown-menu" role="menu">
-              <li><a href="#">Driver</a></li>
-              <li><a href="#">Administrator</a></li>
+            <ul class="dropdown-menu" role="menu" id='dd'>
+              <li><a>Driver</a></li>
+              <li><a>Administrator</a></li>
             </ul>
           </div>
           <br/><br/>
@@ -82,15 +84,15 @@
 
 
           <br/><br/>
-          <button type="button" class="btn btn-default button-style"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add User</button>
+          <button type="button" class="btn btn-default button-style" onclick="addUser()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add User</button>
         <br/><br/>
         </div>
 
         <div class="jumbotron">
         <h2 class="lead text-center">Delete Users</h2>
 
-        <div class="list-group form-center">
-          <a class="list-group-item">
+        <div class="list-group form-center" id="user-list">
+          <!--<a class="list-group-item">
             <span class="badge"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></span>
             Jim Cooper (Admin)
           </a>
@@ -105,13 +107,14 @@
           <a class="list-group-item">
             <span class="badge"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></span>
             Rachel Williams (Driver)
-          </a>
+          </a>-->
         </div>
       </div>
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
+    <script src="js/accounts.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="js/ie10-viewport-bug-workaround.js"></script>
     <script>

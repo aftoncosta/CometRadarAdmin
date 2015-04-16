@@ -122,6 +122,99 @@ app.get('/doQuery', function(req, res){
     connection.end();
 });
 
+//Add a user to the database
+app.get('/add-user', function (req, res) {
+  var connection = mysql.createConnection({
+    host     : '69.195.124.139',
+    user     : 'bsxpccom_teamX',
+    password : 'C$1RFKqdCr&w',
+    database : 'bsxpccom_cometradar'
+  });
+
+  connection.connect(function(err){
+    if (err){
+        console.log('DB Connection error');
+    }
+  });
+  
+  email = req.query.email;
+  fname = req.query.fname;
+  lname = req.query.lname;
+  type = req.query.tp;
+  pwd = req.query.pwd;
+
+  picture = '';
+
+  connection.query('INSERT INTO bsxpccom_cometradar.users VALUES ("' + email + '","' + pwd + '","' + fname + '","' + lname + '","' + type + '","' + picture + '");', function(err, rows, fields){
+    if (err) throw err;
+    res.send(rows);
+  });
+  
+  connection.end();
+});
+
+
+// Deletes a user
+app.get('/delete-user', function (req, res) {
+  var connection = mysql.createConnection({
+    host     : '69.195.124.139',
+    user     : 'bsxpccom_teamX',
+    password : 'C$1RFKqdCr&w',
+    database : 'bsxpccom_cometradar'
+  });
+
+  connection.connect(function(err){
+    if (err){
+        console.log('DB Connection error');
+    }
+  });
+  email = req.query.email;
+
+  // Delete the user from ROUTEDATA
+  connection.query('DELETE FROM bsxpccom_cometradar.routedata WHERE bsxpccom_cometradar.routedata.email = "' + email + '";', function(err, rows, fields){
+    if (err) throw err;
+  });
+
+  // Delete the user from CURRENT_ROUTE
+  connection.query('DELETE FROM bsxpccom_cometradar.current_route WHERE bsxpccom_cometradar.current_route.email = "' + email + '";', function(err, rows, fields){
+    if (err) throw err;
+  });
+
+  // Delete the user from USERS
+  connection.query('DELETE FROM bsxpccom_cometradar.users WHERE bsxpccom_cometradar.users.email = "' + email + '";', function(err, rows, fields){
+    if (err) throw err;
+  });
+
+  // return new set of users
+  connection.query('SELECT * FROM bsxpccom_cometradar.users;', function(err, rows, fields){
+    if (err) throw err;
+    res.send(rows);
+  });
+  connection.end();
+});
+
+// Get user
+app.get('/get-users', function (req, res) {
+  var connection = mysql.createConnection({
+    host     : '69.195.124.139',
+    user     : 'bsxpccom_teamX',
+    password : 'C$1RFKqdCr&w',
+    database : 'bsxpccom_cometradar'
+  });
+
+  connection.connect(function(err){
+    if (err){
+        console.log('DB Connection error');
+    }
+  });
+  
+  connection.query('SELECT * FROM bsxpccom_cometradar.users;', function(err, rows, fields){
+    if (err) throw err;
+    res.send(rows);
+  });
+  connection.end();
+});
+
 //Add a route to the database
 app.get('/add-route', function (req, res) {
   var connection = mysql.createConnection({
@@ -145,6 +238,8 @@ app.get('/add-route', function (req, res) {
   wayptsLat = req.query.wayptsLat;
   wayptsLong = req.query.wayptsLong;
 
+  //console.log('app.js ' + wayptsLat);
+
   connection.query('INSERT INTO bsxpccom_cometradar.routes VALUES ("' + name + '","' + origin_lat + '","' + origin_long + '","' + dest_lat + '","' + dest_long + '");', function(err, rows, fields){
     if (err) throw err;
 
@@ -156,9 +251,10 @@ app.get('/add-route', function (req, res) {
       }
     }
     res.send(rows);
+    connection.end();
   });
   
-  connection.end();
+  //connection.end();
 });
 
 //Gets a route's waypoints
