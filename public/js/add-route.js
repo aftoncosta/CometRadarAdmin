@@ -157,7 +157,6 @@ function addRoute(){
     type: 'GET',
     dataType: 'json',
     async: false,
-    timeout: 5000,
     success: function(data) {
         
         for(var i in data){
@@ -168,10 +167,10 @@ function addRoute(){
     },
     error: function(jqXHR, textStatus, errorThrown) {
         alert('error ' + textStatus + " " + errorThrown);    
-        if (exists) {
+       /* if (exists) {
           alert("Name already exists");
           return false;
-        }
+        }*/
     }
   });
 
@@ -182,18 +181,19 @@ function addRoute(){
 
   //k = latitide
   //D = longitude
-  origin_lat = directionsDisplay.directions.tc.origin.k;
-  origin_long = directionsDisplay.directions.tc.origin.D;
-  dest_lat = directionsDisplay.directions.tc.destination.k;
-  dest_long = directionsDisplay.directions.tc.destination.D;
+  //console.log(JSON.stringify(directionsDisplay.directions));
+  origin_lat = directionsDisplay.directions.request.origin.k;
+  origin_long = directionsDisplay.directions.request.origin.D;
+  dest_lat = directionsDisplay.directions.request.destination.k;
+  dest_long = directionsDisplay.directions.request.destination.D;
   var waypointsLat = [];
   var waypointsLong = [];
-  var wayArray = directionsDisplay.getDirections().tc.waypoints;
+  var wayArray = directionsDisplay.directions.request.waypoints;
   for ( var i in wayArray){
       waypointsLat[i] = wayArray[i].location.k;
       waypointsLong[i] = wayArray[i].location.D;
   }
-  
+  console.log(waypointsLat);
   //Add Route to Database
   $.ajax({
     url: 'http://127.0.0.1:3000/add-route', 
@@ -208,7 +208,6 @@ function addRoute(){
         'wayptsLat' : waypointsLat,
         'wayptsLong' : waypointsLong
     },
-    timeout: 5000,
     success: function(data) {
       alert(name + " Route added to Database");
       return false;

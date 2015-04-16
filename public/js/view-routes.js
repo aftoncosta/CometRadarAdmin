@@ -129,7 +129,6 @@
     url: 'http://127.0.0.1:3000/route-waypoints?route=' + name, 
     type: 'GET',
     dataType: 'json',
-    timeout: 5000,
     success: function(data) {
       var waypts = [];
 
@@ -157,7 +156,6 @@
     url: 'http://127.0.0.1:3000/route-names',
     type: 'GET',
     dataType: 'json',
-    timeout: 5000,
     success: function(data) {
 
         document.getElementById("dropdown-main").innerText = data[0].route_name;
