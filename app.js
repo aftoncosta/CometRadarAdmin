@@ -532,7 +532,8 @@ app.get('/api/getShuttleCapacity', function(req, res){
     console.log('connected as id ' + connection.threadId);
   });
 
-  connection.query('SELECT * FROM `shuttle` WHERE shuttle = (SELECT shuttle FROM `current_route` WHERE route_name = \'' + req.query.rname = '\'', 
+  connection.query('SELECT * FROM `shuttle` WHERE shuttle = (SELECT shuttle FROM `current_route` WHERE route_name = \''
+  	+ req.query.rname + '\'')', 
     function (error, results, fields) {
     	console.log('Error: ' + error);
     	res.send(results);
