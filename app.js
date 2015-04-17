@@ -107,17 +107,14 @@ app.get('/doQuery', function(req, res){
 
     connection.connect(function(err){
       if (err){
-          console.log('doQuery: DB Connection error');
+          console.log('DB Connection error');
       }
     });
 
     var query = req.query.string; // store the part of the URL that comes after ?string= ... we send this in the android app
     connection.query(query, function(err, rows, fields){  // calls the query
     
-      if (err){
-        throw err;
-        console.log('doQuery: DB query error');
-      }
+    if (err) throw err;
     	res.send(rows);   // sends the response data (in JSON format) back to android. You can also check the response at localhost:3001/sendPickup?string=YOUR QUERY HERE
                         // for INSERT commands, it just returns the number of rows changed and some other useless crap
                         // but for SELECT commands, it'll return the DB rows in JSON format. Look at localhost:3000/route-names as an example
@@ -229,7 +226,7 @@ app.get('/add-route', function (req, res) {
 
   connection.connect(function(err){
     if (err){
-        console.log('add-route: DB Connection error');
+        console.log('DB Connection error');
     }
   });
   
@@ -256,6 +253,8 @@ app.get('/add-route', function (req, res) {
     res.send(rows);
     connection.end();
   });
+  
+  //connection.end();
 });
 
 //Gets a route's waypoints
@@ -269,7 +268,7 @@ app.get('/route-waypoints', function (req, res) {
 
   connection.connect(function(err){
     if (err){
-        console.log('route-waypoints: DB Connection error');
+        console.log('DB Connection error');
     }
   });
 
@@ -294,7 +293,7 @@ app.get('/delete-route', function (req, res) {
 
   connection.connect(function(err){
     if (err){
-        console.log('delete-route: DB Connection error');
+        console.log('DB Connection error');
     }
   });
   route = req.query.route;
@@ -333,7 +332,7 @@ app.get('/route-names', function (req, res) {
 
   connection.connect(function(err){
     if (err){
-        console.log('route-names: DB Connection error');
+        console.log('DB Connection error');
     }
   });
   
@@ -430,32 +429,6 @@ app.get('/api/getRiderLocations', function (req, res) {
   connection.end();
 });
 
-//TODO move behind login wall
-app.get('/api/getRoute', function (req, res) {
-  var connection = mysql.createConnection({
-    host     : '69.195.124.139',
-    user     : 'bsxpccom_teamX',
-    password : 'C$1RFKqdCr&w',
-    database : 'bsxpccom_cometradar'
-  });
-
-  connection.connect(function(err) {
-    if (err) {
-      console.error('error connecting: ' + err.stack);
-      return;
-    }
-    console.log('connected as id ' + connection.threadId);
-  });
-
-  connection.query('SELECT r.order, r.wp_lat AS lat, r.wp_long AS \'long\' FROM `route_waypoints` as r WHERE ROUTE_NAME=\'' + req.query.rname + '\' ORDER BY r.order ASC', function (error, results, fields) {
-
-    console.log('Error: ' + error);
-    res.send(results);
-  }); 
-  connection.end();
-});
-
-//TODO move behind login wall
 app.get('/api/updateLocation', function (req, res) {
   var connection = mysql.createConnection({
     host     : '69.195.124.139',
@@ -480,7 +453,7 @@ app.get('/api/updateLocation', function (req, res) {
   connection.end(); 
 });
 
-//TODO add pickup/dropoff to route_stops
+//updates stop locations on a given route
 //requires rname, lat, long, isPickup
 app.get('/api/updateRouteStops', function(req, res){
   var connection = mysql.createConnection({
@@ -498,7 +471,7 @@ app.get('/api/updateRouteStops', function(req, res){
     console.log('connected as id ' + connection.threadId);
   });
 
-  connection.query('INSERT INTO `routestops` (route_name, date, lat, long, isPickup) VALUES (\'' 
+  connection.query('INSERT INTO `routestops` AS r (r.route_name, r.date, r.lat, r.long, r.isPickup) VALUES (\'' 
   	+ req.query.rname + '\',\'' + (new Date().toISOString().slice(0, 19).replace('T', ' ')) + '\',' + req.query.lat 
   	+ ',' + req.query.long + ',' + req.query.isPickup, 
     function (error, results, fields) {
@@ -511,7 +484,7 @@ app.get('/api/updateRouteStops', function(req, res){
 })
 
 //TODO test updateridercount
-//TODO create SQL for adding riders
+//TODO update SQL WHERE clause to select primary key
 app.get('/api/updateRiderCount', function(req, res){
   var connection = mysql.createConnection({
     host     : '69.195.124.139',
@@ -528,8 +501,8 @@ app.get('/api/updateRiderCount', function(req, res){
     console.log('connected as id ' + connection.threadId);
   });
 
-  connection.query('INSERT ' + req.query.route + ' `current_route` SET currentLat=\'' + req.query.lat + '\',currentLong=\'' + req.query.long 
-    + '\' WHERE route_name=\'' + req.query.rname + '\'', 
+  connection.query('UPDATE `current_route` SET students_on_shuttle=' + req.query.currentCapacity 
+  	+ ' WHERE route_name=\'' + req.query.rname + '\'', 
     function (error, results, fields) {
     	console.log('Error: ' + error);
     	res.send(results);
@@ -539,6 +512,7 @@ app.get('/api/updateRiderCount', function(req, res){
 })
 
 //get the current shuttle's max capacity
+//TODO update SQL WHERE clause to select primary key
 app.get('/api/getShuttleCapacity', function(req, res){
   var connection = mysql.createConnection({
     host     : '69.195.124.139',
