@@ -479,6 +479,90 @@ app.get('/api/updateLocation', function (req, res) {
   connection.end(); 
 });
 
+//TODO add pickup/dropoff to route_stops
+//requires rname, lat, long, isPickup
+app.get('/api/updateRouteStops', function(req, res){
+  var connection = mysql.createConnection({
+    host     : '69.195.124.139',
+    user     : 'bsxpccom_teamX',
+    password : 'C$1RFKqdCr&w',
+    database : 'bsxpccom_cometradar'
+  });
+
+  connection.connect(function(err) {
+    if (err) {
+      console.error('error connecting: ' + err.stack);
+      return;
+    }
+    console.log('connected as id ' + connection.threadId);
+  });
+
+  connection.query('INSERT INTO `routestops` (route_name, date, lat, long, isPickup) VALUES (\'' 
+  	+ req.query.rname + '\',\'' + (new Date().toISOString().slice(0, 19).replace('T', ' ')) + '\',' + req.query.lat 
+  	+ ',' + req.query.long + ',' + req.query.isPickup, 
+    function (error, results, fields) {
+    	console.log('Error: ' + error);
+    	res.send(results);
+  	}
+  );
+
+  connection.end(); 	
+})
+
+//TODO test updateridercount
+//TODO create SQL for adding riders
+app.get('/api/updateRiderCount', function(req, res){
+  var connection = mysql.createConnection({
+    host     : '69.195.124.139',
+    user     : 'bsxpccom_teamX',
+    password : 'C$1RFKqdCr&w',
+    database : 'bsxpccom_cometradar'
+  });
+
+  connection.connect(function(err) {
+    if (err) {
+      console.error('error connecting: ' + err.stack);
+      return;
+    }
+    console.log('connected as id ' + connection.threadId);
+  });
+
+  connection.query('INSERT ' + req.query.route + ' `current_route` SET currentLat=\'' + req.query.lat + '\',currentLong=\'' + req.query.long 
+    + '\' WHERE route_name=\'' + req.query.rname + '\'', 
+    function (error, results, fields) {
+    	console.log('Error: ' + error);
+    	res.send(results);
+  	}
+  );
+  connection.end(); 	
+})
+
+//get the current shuttle's max capacity
+app.get('/api/getShuttleCapacity', function(req, res){
+  var connection = mysql.createConnection({
+    host     : '69.195.124.139',
+    user     : 'bsxpccom_teamX',
+    password : 'C$1RFKqdCr&w',
+    database : 'bsxpccom_cometradar'
+  });
+
+  connection.connect(function(err) {
+    if (err) {
+      console.error('error connecting: ' + err.stack);
+      return;
+    }
+    console.log('connected as id ' + connection.threadId);
+  });
+
+  connection.query('SELECT * FROM `shuttle` WHERE shuttle = (SELECT shuttle FROM `current_route` WHERE route_name = \'' + req.query.rname = '\'', 
+    function (error, results, fields) {
+    	console.log('Error: ' + error);
+    	res.send(results);
+  	}
+  );
+  connection.end(); 	
+})
+
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/public/index.html');
 });
