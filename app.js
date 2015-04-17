@@ -474,7 +474,7 @@ app.get('/api/updateRouteStops', function(req, res){
   console.log("req.query.lat: " + req.query.lat);
   console.log("req.query.long: " + req.query.long);
 
-  connection.query('INSERT INTO `routestops` (route_name,date,lat,\'long\',isPickup) VALUES (\'' 
+  connection.query('INSERT INTO `routestops` AS rs (rs.route_name,rs.date,rs.lat,rs.long,rs.isPickup) VALUES (\'' 
   	+ req.query.rname + '\',\'' + (new Date().toISOString().slice(0, 19).replace('T', ' ')) + '\',' + req.query.lat 
   	+ ',' + req.query.long + ',' + req.query.isPickup, 
     function (error, results, fields) {
