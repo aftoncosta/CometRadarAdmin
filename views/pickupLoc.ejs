@@ -2,19 +2,13 @@
 <head>
 <script type="text/javascript" src="cSnapToRoute.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-   
 <script>
     var scriptTag = '<' + 'script src="http://maps.google.com/maps?file=api&v=2&key=ABQIAAAAaM_sLwiURV29A34WD9kD4xTEnAIqM-Bl8RvAWQX--wxQYWaF3hSzadXTlJzp6USDLBVMnFFYaLq84Q">'+'<'+'/script>';
     document.write(scriptTag);
 </script>
-<!--script>
-    var scriptTag = '<' + 'script src="http://maps.google.com/maps?file=api&v=3&key=AAIzaSyAM5N1611dbRnkSCLfoDwzhp0PPZkTnrkY">'+'<'+'/script>';
-    document.write(scriptTag);
-</script-->
 <script type="text/javascript">
-window.onload = function ()
-{
-load();
+window.onload = function (){
+    load();
 }
 
 var decodedPoly;
@@ -23,9 +17,7 @@ var rendererOptions = {
     draggable: false
 };
 var directionsDisplay = new google.maps.DirectionsRenderer(rendererOptions);
-
-  var directionsService = new google.maps.DirectionsService();
-
+var directionsService = new google.maps.DirectionsService();
 var vars = [], hash;
 
 
@@ -41,8 +33,7 @@ function calcRoute(olat, olong, dlat, dlong, wp) {
       if (status == google.maps.DirectionsStatus.OK) {
         directionsDisplay.setDirections(response);
         decodedPoly = google.maps.geometry.encoding.decodePath(directionsDisplay.directions.routes[0].overview_polyline);
-        console.log(decodedPoly);
-    doLoad();
+        doLoad();
       }
     });
 }
@@ -56,9 +47,6 @@ var normalProj = G_NORMAL_MAP.getProjection();
 var threshold = 15; //pixels for proximity
 var oSnap;
 
-//console.log(directionsDisplay);
-
-//console.log(decodedPoly);
 
 function load() {
     var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
@@ -86,7 +74,6 @@ function load() {
               }
           }
           calcRoute(data[0].originLat, data[0].originLong, data[0].destLat, data[0].destLong, waypts);
-     //console.log(decodedPoly);
         },
         error: function(jqXHR, textStatus, errorThrown) {
             alert('error ' + textStatus + " " + errorThrown);
@@ -106,7 +93,6 @@ function doLoad() {
     for(var i in decodedPoly){
         addRoutePoint(new GLatLng(decodedPoly[i].k, decodedPoly[i].D));
     }
-console.log(vars)
     mapMove(new GLatLng(vars.lat, vars.long));
 }
 
@@ -116,7 +102,6 @@ function mapMove(point) {
         oSnap.getDistAlongRoute(point).toFixed(0);
     	oStatusDiv.innerHTML =  oSnap.getClosestLatLng(point);
     
-        //console.log(oSnap.getClosestLatLng(point).k);
         $.ajax({
             url: "http://127.0.0.1:3000/doQuery?string=INSERT INTO pickup_request (pickup_request.route_name, pickup_request.lat, pickup_request.long) VALUES ('" + vars.route + "', '" + oSnap.getClosestLatLng(point).k + "', '" + oSnap.getClosestLatLng(point).D + "');", 
             type: 'GET',
@@ -131,7 +116,7 @@ function addRoutePoint(point) {
     var Px = normalProj.fromLatLngToPixel(point, zoom);
     routePixels.push(Px);
 
-    if (routePoints.length > 1)    {
+    if (routePoints.length > 1){
         plotRoute();
         if ( !oSnap ) {
             oSnap = new cSnapToRoute();
@@ -172,8 +157,8 @@ function resetRoute() {
 
 </script>
 </head>
-<body><!--onload="load()" onunload="GUnload()"-->
+<body>
     <div id="map" style="width: 700px; height: 500px"></div>
-    <div id="statusDiv"></div><!--end-->
+    <div id="statusDiv"></div>
 </body>
 </html>

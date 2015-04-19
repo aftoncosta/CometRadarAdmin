@@ -24,8 +24,9 @@ function formSubmit(){
 	});
 
 	if (!exists) {
-	  alert("Invalid username or password!");
-	  return false;
+	    document.getElementById("warning").innerHTML = "Invalid username or password!";
+	    document.getElementById("warningDiv").style.display = "block";
+	  	return false;
 	}
 	else{
 		window.location.href = "dash.html";

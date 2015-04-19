@@ -20,10 +20,8 @@ var overlay, map, pointarray, heatmap, init = false, routeName = "All", startDat
 
 // Initialize the map and the custom overlay.
 function initialize() {
-	
 	createMap();
 	updateMap();
-	//createHeatMap();
 }
 
 function createMap(){
@@ -47,9 +45,6 @@ function createMap(){
 
 function createHeatMap(){
 	// create heatmap
-	//cabData = [];
-	//heatmap.setData(new google.maps.MVCArray(cabData));
-	//toggleHeatmap();
 	var pointArray = heatmap = null;
 	var pointArray = new google.maps.MVCArray(cabData);
 	heatmap = new google.maps.visualization.HeatmapLayer({

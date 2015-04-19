@@ -101,28 +101,28 @@ function createMarkers(id){
   var myLatLng = new google.maps.LatLng(cabLat[id], cabLong[id]);
 
   var marker = new google.maps.Marker({
-        position: myLatLng,
-        map: map,
-        icon: images[id],
-        title: routeNames[id],
-        zIndex: 3
+    position: myLatLng,
+    map: map,
+    icon: images[id],
+    title: routeNames[id],
+    zIndex: 3
   });
 
   google.maps.event.addListener(marker, 'click', function() {
-      initChart();
-      $('.chart').css(
-        {
-          visibility: "visible",
-          display: "block"
-        }
-      );
-      var s = (cabOccupancy[id] == 1) ? '' : 's';
-      document.getElementById("pieDiv").innerHTML = '<div class="chart" data-percent="' + (cabOccupancy[id]/cabMax[id])*100 + '" id="easy-pie-chart"><span class="percent">' + cabOccupancy[id] + ' rider' + s + ' right now</span></div>';
+    initChart();
+    $('.chart').css(
+      {
+        visibility: "visible",
+        display: "block"
+      }
+    );
+    var s = (cabOccupancy[id] == 1) ? '' : 's';
+    document.getElementById("pieDiv").innerHTML = '<div class="chart" data-percent="' + (cabOccupancy[id]/cabMax[id])*100 + '" id="easy-pie-chart"><span class="percent">' + cabOccupancy[id] + ' rider' + s + ' right now</span></div>';
 
-      document.getElementById("cabDetails").innerHTML = "<br/><text style='font-size: 150%;'>Driver:</text><br/>" + cabDriver[id] + "<br/><img style='width:210px;height:210px; -webkit-border-radius: 50px;' src='" + driverPhoto[id] + "''><br/><br/>"
-                                                          + "<br/><text style='font-size: 150%;'>Route:</text><br/>" + routeNames[id] + "<br/><br/>"
-                                                              + "<br/><text style='font-size: 150%;'>Shift:</text><br/>" + formatAMPM(new Date(shiftStart[id])) + " - " + formatAMPM(new Date(shiftEnd[id])) + "<br/>"
-                                                              + "<br/><h3 style='margin-bottom: 0px'>Cab #" + cabNumbers[id] + " is </h3><h3 style='font-size: 250%; margin: 0px'>" + cabStatusString[id] + "</h3>" ;
+    document.getElementById("cabDetails").innerHTML = "<br/><text style='font-size: 150%;'>Driver:</text><br/>" + cabDriver[id] + "<br/><img style='width:210px;height:210px; -webkit-border-radius: 50px;' src='" + driverPhoto[id] + "''><br/><br/>"
+                                                      + "<br/><text style='font-size: 150%;'>Route:</text><br/>" + routeNames[id] + "<br/><br/>"
+                                                      + "<br/><text style='font-size: 150%;'>Shift:</text><br/>" + formatAMPM(new Date(shiftStart[id])) + " - " + formatAMPM(new Date(shiftEnd[id])) + "<br/>"
+                                                      + "<br/><h3 style='margin-bottom: 0px'>Cab #" + cabNumbers[id] + " is </h3><h3 style='font-size: 250%; margin: 0px'>" + cabStatusString[id] + "</h3>" ;
   });
   return marker;
 }
@@ -139,7 +139,6 @@ function formatAMPM(date) {
 }
 
 function USGSOverlay(bounds, image, map) {
-
   // Initialize all properties.
   this.bounds_ = bounds;
   this.image_ = image;
@@ -180,7 +179,6 @@ USGSOverlay.prototype.onAdd = function() {
 };
 
 USGSOverlay.prototype.draw = function() {
-
   // We use the south-west and north-east
   // coordinates of the overlay to peg it to the correct position and size.
   // To do this, we need to retrieve the projection from the overlay.
@@ -225,7 +223,6 @@ var myAjaxCall = function() {
             cabMax[cab]       = data[cab].max;
             cabDriver[cab]    = data[cab].fname + ' ' + data[cab].lname; 
             driverPhoto[cab]  = "/uploads/" + data[cab].picture;
-            console.log(driverPhoto[cab]);
             shiftStart[cab]   = data[cab].shiftstart_date;
             shiftEnd[cab]     = data[cab].shiftend_date;
             cabFull[cab]      = (data[cab].students_on_shuttle >= data[cab].max) ? true : false;

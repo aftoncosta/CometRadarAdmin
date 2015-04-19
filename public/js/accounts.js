@@ -93,7 +93,6 @@ function addUser(){
     },
     error: function(jqXHR, textStatus, errorThrown) {
         alert('Get User 1 error ' + textStatus + " " + errorThrown);    
-        
     }
   });
 
@@ -166,7 +165,6 @@ function getUsers(){
 }
 
 function deleteUser(email){
-
     $.ajax({
         url: 'http://' + ip + ':3000/delete-user?email=' + email,    // Pass route name here through a query
         type: 'GET',

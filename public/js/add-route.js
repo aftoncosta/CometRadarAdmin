@@ -19,7 +19,6 @@ function initialize() {
   };
 
   var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
-
   var swBound = new google.maps.LatLng(32.976600, -96.761700);
   var neBound = new google.maps.LatLng(32.995650, -96.739400);
   var bounds = new google.maps.LatLngBounds(swBound, neBound);
@@ -133,7 +132,6 @@ function computeTotalDistance(result) {
   total = total / 1000.0;
 }
 
-
 google.maps.event.addDomListener(window, 'load', initialize);
 
 function inputClick(){
@@ -149,7 +147,8 @@ function addRoute(){
  
   //Check for empty name
   if (name == null || name == "" || name == 'Route name') {
-    alert("Route Name must be filled out");
+    document.getElementById("warning").innerHTML = "Route Name must be filled out";
+    document.getElementById("warningDiv").style.display = "block";
     return false;
   }
   var exists = false;
@@ -160,7 +159,6 @@ function addRoute(){
     dataType: 'json',
     async: false,
     success: function(data) {
-        
         for(var i in data){
             if(name.toLowerCase() == (data[i].route_name).toLowerCase()){
               exists = true;
@@ -169,21 +167,17 @@ function addRoute(){
     },
     error: function(jqXHR, textStatus, errorThrown) {
         alert('error ' + textStatus + " " + errorThrown);    
-       /* if (exists) {
-          alert("Name already exists");
-          return false;
-        }*/
     }
   });
 
   if (exists) {
-    alert("Name already exists");
+    document.getElementById("warning").innerHTML = "Name already exists";
+    document.getElementById("warningDiv").style.display = "block";
     return false;
   }
 
   //k = latitide
   //D = longitude
-  //console.log(JSON.stringify(directionsDisplay.directions));
   origin_lat = directionsDisplay.directions.request.origin.k;
   origin_long = directionsDisplay.directions.request.origin.D;
   dest_lat = directionsDisplay.directions.request.destination.k;
@@ -195,7 +189,6 @@ function addRoute(){
       waypointsLat[i] = wayArray[i].location.k;
       waypointsLong[i] = wayArray[i].location.D;
   }
-  console.log(waypointsLat);
   //Add Route to Database
   $.ajax({
     url: 'http://' + ip + ':3000/add-route', 
@@ -211,7 +204,9 @@ function addRoute(){
         'wayptsLong' : waypointsLong
     },
     success: function(data) {
-      alert(name + " Route added to Database");
+      document.getElementById("success").innerHTML = name + " Route added to Database!";
+      document.getElementById("successDiv").style.display = "block";
+      document.getElementById("warningDiv").style.display = "none";
       return false;
     },
     error: function(jqXHR, textStatus, errorThrown) {
