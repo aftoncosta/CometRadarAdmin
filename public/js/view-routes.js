@@ -1,3 +1,4 @@
+var ip = '104.197.3.201';
 
   USGSOverlay.prototype = new google.maps.OverlayView();
 
@@ -126,7 +127,7 @@
     //document.getElementById("dropdown-main").innerText = name;
 
     $.ajax({
-    url: 'http://127.0.0.1:3000/route-waypoints?route=' + name, 
+    url: 'http://' + ip + ':3000/route-waypoints?route=' + name, 
     type: 'GET',
     dataType: 'json',
     success: function(data) {
@@ -153,11 +154,10 @@
   google.maps.event.addDomListener(window, 'load', initialize);
 
   $.ajax({
-    url: 'http://127.0.0.1:3000/route-names',
+    url: 'http://' + ip + ':3000/route-names',
     type: 'GET',
     dataType: 'json',
     success: function(data) {
-
         document.getElementById("dropdown-main").innerText = data[0].route_name;
         
         for(var i in data){

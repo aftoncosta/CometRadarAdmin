@@ -1,3 +1,5 @@
+var ip = '104.197.3.201';
+
 var rendererOptions = {
   draggable: true
 };
@@ -153,7 +155,7 @@ function addRoute(){
   var exists = false;
   //Check to see if name already exists
   $.ajax({
-    url: 'http://127.0.0.1:3000/route-names',
+    url: 'http://' + ip + ':3000/route-names',
     type: 'GET',
     dataType: 'json',
     async: false,
@@ -196,7 +198,7 @@ function addRoute(){
   console.log(waypointsLat);
   //Add Route to Database
   $.ajax({
-    url: 'http://127.0.0.1:3000/add-route', 
+    url: 'http://' + ip + ':3000/add-route', 
     type: 'GET',
     dataType: 'json',
     data: {

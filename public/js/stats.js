@@ -1,3 +1,5 @@
+var ip = '104.197.3.201';
+
 // Initalize jQuery Datepicker
 $(function() {
 	$( "#datepicker" ).datepicker({
@@ -177,7 +179,7 @@ function updateMap(){
 
 
 	$.ajax({
-		url: 'http://127.0.0.1:3000/stops?route=' + routeName + '&startDate=' + startDate + '&endDate=' + endDate,
+		url: 'http://' + ip + ':3000/stops?route=' + routeName + '&startDate=' + startDate + '&endDate=' + endDate,
 		type: 'GET',
 		dataType: 'json',
 		success: function(data) {
@@ -219,7 +221,7 @@ function updateMap(){
 }
 
 $.ajax({
-	url: 'http://127.0.0.1:3000/route-names',
+	url: 'http://' + ip + ':3000/route-names',
 	type: 'GET',
 	dataType: 'json',
 	success: function(data) {

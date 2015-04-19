@@ -1,12 +1,13 @@
-var express = require('express');
-var app = express();
-var port    = parseInt(process.env.PORT, 10) || 3000;
-var mysql      = require('mysql');
-var passport = require('passport');
-var util = require('util');
+var express       = require('express');
+var app           = express();
+var port          = parseInt(process.env.PORT, 10) || 3000;
+var mysql         = require('mysql');
+var passport      = require('passport');
+var util          = require('util');
+var multer        = require('multer');
 var LocalStrategy = require('passport-local').Strategy;
-  
-var users = [
+var expressSession = require('express-session');
+var users         = [
     { id: 1, username: 'bob', password: 'secret', email: 'bob@example.com' }
   , { id: 2, username: 'joe', password: 'birthday', email: 'joe@example.com' }
 ];
@@ -70,11 +71,14 @@ passport.use(new LocalStrategy(
   }
 ));
 
+
+
+
 // Configuring Passport
-var expressSession = require('express-session');
 //app.use(expressSession({secret: 'mySecretKey'}));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(express.static(__dirname + "/public"));
 
 app.get('/logout', function(req, res){
   req.logout();
@@ -93,7 +97,7 @@ function ensureAuthenticated(req, res, next) {
 }
 
 
-app.use(express.static(__dirname + "/public"));
+
 
 
 // RIDER APP app
@@ -122,6 +126,66 @@ app.get('/doQuery', function(req, res){
     connection.end();
 });
 
+app.get('/pickup', function(req, res){
+    
+  var connection = mysql.createConnection({
+    host     : '69.195.124.139',
+    user     : 'bsxpccom_teamX',
+    password : 'C$1RFKqdCr&w',
+    database : 'bsxpccom_cometradar'
+  });
+
+  connection.connect(function(err){
+    if (err){
+        console.log('pickup: DB Connection error');
+    }
+  });
+
+
+  var route = req.query.route; 
+  var lat = req.query.lat; 
+  var lon = req.query.lon; 
+  //var idNum;
+  res.render("pickupLoc.ejs", { route: route, lat:lat, lon:lon }, function(err, response) {
+    connection.query("SHOW TABLE STATUS LIKE 'pickup_request';", function(err, rows, fields){  // calls the query
+    
+      if (err){
+        throw err;
+        console.log('pickup: DB query error');
+      }
+      //console.log(rows[0].Auto_increment);
+      res.send(response + '<div id="id">' + rows[0].Auto_increment + '</div>');
+      //console.log({ id : rows[0].Auto_increment}); 
+      //idNum = rows[0].Auto_increment;
+    });
+      //res.send({ id : idNum} );  
+    connection.end();
+  });
+});
+
+// Upload user photos to /public/uploads
+app.use(multer({ dest: './public/uploads/',
+ rename: function (fieldname, filename) {
+    return filename+Date.now();
+  },
+onFileUploadStart: function (file) {
+  console.log(file.originalname + ' is starting ...')
+},
+onFileUploadComplete: function (file) {
+  console.log(file.fieldname + ' uploaded to  ' + file.path)
+  done=true;
+}
+}));
+
+
+app.post('/api/photo',function(req,res){
+  if(done==true){
+    console.log(req.files.userPhoto.name);
+    res.end(req.files.userPhoto.name);
+  }
+});
+
+
 //Add a user to the database
 app.get('/add-user', function (req, res) {
   var connection = mysql.createConnection({
@@ -142,8 +206,7 @@ app.get('/add-user', function (req, res) {
   lname = req.query.lname;
   type = req.query.tp;
   pwd = req.query.pwd;
-
-  picture = '';
+  picture = req.query.photo;
 
   connection.query('INSERT INTO bsxpccom_cometradar.users VALUES ("' + email + '","' + pwd + '","' + fname + '","' + lname + '","' + type + '","' + picture + '");', function(err, rows, fields){
     if (err) throw err;
@@ -152,7 +215,6 @@ app.get('/add-user', function (req, res) {
   
   connection.end();
 });
-
 
 // Deletes a user
 app.get('/delete-user', function (req, res) {
@@ -395,7 +457,7 @@ app.get('/route-data', function (req, res) {
     }
   });
 
-  connection.query('SELECT route_name, a.shuttle, students_on_shuttle, max, shiftstart_date, shiftend_date, currentLat, currentLong, fname, lname, onduty FROM (SELECT bsxpccom_cometradar.current_route.*, bsxpccom_cometradar.users.fname, bsxpccom_cometradar.users.lname FROM bsxpccom_cometradar.current_route INNER JOIN users ON bsxpccom_cometradar.current_route.email = bsxpccom_cometradar.users.email) a JOIN (SELECT bsxpccom_cometradar.routedata.onduty, bsxpccom_cometradar.routedata.email, bsxpccom_cometradar.routedata.shiftstart_date, bsxpccom_cometradar.routedata.shiftend_date, bsxpccom_cometradar.shuttle.max, bsxpccom_cometradar.shuttle.shuttle FROM bsxpccom_cometradar.routedata INNER JOIN shuttle ON bsxpccom_cometradar.routedata.shuttle = bsxpccom_cometradar.shuttle.shuttle) b ON a.email = b.email AND a.shuttle = b.shuttle;',
+  connection.query('SELECT route_name, a.shuttle, students_on_shuttle, max, shiftstart_date, shiftend_date, currentLat, currentLong, fname, lname,  picture, onduty FROM (SELECT bsxpccom_cometradar.current_route.*, bsxpccom_cometradar.users.fname, bsxpccom_cometradar.users.lname, bsxpccom_cometradar.users.picture FROM bsxpccom_cometradar.current_route INNER JOIN users ON bsxpccom_cometradar.current_route.email = bsxpccom_cometradar.users.email) a JOIN (SELECT bsxpccom_cometradar.routedata.onduty, bsxpccom_cometradar.routedata.email, bsxpccom_cometradar.routedata.shiftstart_date, bsxpccom_cometradar.routedata.shiftend_date, bsxpccom_cometradar.shuttle.max, bsxpccom_cometradar.shuttle.shuttle FROM bsxpccom_cometradar.routedata INNER JOIN shuttle ON bsxpccom_cometradar.routedata.shuttle = bsxpccom_cometradar.shuttle.shuttle) b ON a.email = b.email AND a.shuttle = b.shuttle;',
     function(err, rows, fields){
       if (err) throw err;
       res.send(rows);
