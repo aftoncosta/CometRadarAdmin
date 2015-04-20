@@ -1,6 +1,7 @@
+var ip = '104.197.3.201';
+
 getUsers();
 
-var ip = '104.197.3.201';
 var deffn = 'First Name';
 var defln = 'Last Name';
 var defp = 'Password';

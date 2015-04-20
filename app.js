@@ -7,6 +7,8 @@ var util          = require('util');
 var multer        = require('multer');
 var LocalStrategy = require('passport-local').Strategy;
 var expressSession = require('express-session');
+var phantom = require('phantom');
+
 var users         = [
     { id: 1, username: 'bob', password: 'secret', email: 'bob@example.com' }
   , { id: 2, username: 'joe', password: 'birthday', email: 'joe@example.com' }
@@ -71,6 +73,11 @@ passport.use(new LocalStrategy(
   }
 ));
 
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 
 
 
@@ -119,6 +126,7 @@ app.get('/doQuery', function(req, res){
     connection.query(query, function(err, rows, fields){  // calls the query
     
     if (err) throw err;
+      console.log(rows);
     	res.send(rows);   // sends the response data (in JSON format) back to android. You can also check the response at localhost:3001/sendPickup?string=YOUR QUERY HERE
                         // for INSERT commands, it just returns the number of rows changed and some other useless crap
                         // but for SELECT commands, it'll return the DB rows in JSON format. Look at localhost:3000/route-names as an example
@@ -141,26 +149,34 @@ app.get('/pickup', function(req, res){
     }
   });
 
-
   var route = req.query.route; 
   var lat = req.query.lat; 
   var lon = req.query.lon; 
-  //var idNum;
-  res.render("pickupLoc.ejs", { route: route, lat:lat, lon:lon }, function(err, response) {
-    connection.query("SHOW TABLE STATUS LIKE 'pickup_request';", function(err, rows, fields){  // calls the query
-    
-      if (err){
-        throw err;
-        console.log('pickup: DB query error');
-      }
-      //console.log(rows[0].Auto_increment);
-      res.send(response + '<div id="id">' + rows[0].Auto_increment + '</div>');
-      //console.log({ id : rows[0].Auto_increment}); 
-      //idNum = rows[0].Auto_increment;
+
+  phantom.create(function (ph) {
+    ph.createPage(function (page) {
+      page.open("http://127.0.0.1:3000/pickupLocEJS?route=" + route + "&lat=" + lat + "&lon=" + lon, function (status) {
+        setTimeout(function screenshot() {
+          console.log("opened pickupLoc? ", status);
+          page.evaluate(function () { return document.getElementById('statusDiv').innerHTML; }, function (result) {
+            console.log('Location is ' + result);
+            res.send(result);
+            ph.exit();
+          });
+        }, 3 * 1000);        
+      });
     });
-      //res.send({ id : idNum} );  
-    connection.end();
   });
+});
+
+
+app.get('/pickupLocEJS', function(req, res){
+  var route = req.query.route; 
+  var lat = req.query.lat; 
+  var lon = req.query.lon; 
+
+  res.render("pickupLoc.ejs", { route: route, lat: lat, lon: lon });
+  console.log("here");
 });
 
 // Upload user photos to /public/uploads
