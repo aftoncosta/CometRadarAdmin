@@ -135,20 +135,6 @@ app.get('/doQuery', function(req, res){
 });
 
 app.get('/pickup', function(req, res){
-    
-  var connection = mysql.createConnection({
-    host     : '69.195.124.139',
-    user     : 'bsxpccom_teamX',
-    password : 'C$1RFKqdCr&w',
-    database : 'bsxpccom_cometradar'
-  });
-
-  connection.connect(function(err){
-    if (err){
-        console.log('pickup: DB Connection error');
-    }
-  });
-
   var route = req.query.route; 
   var lat = req.query.lat; 
   var lon = req.query.lon; 
