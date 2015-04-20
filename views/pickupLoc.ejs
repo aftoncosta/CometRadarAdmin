@@ -102,7 +102,7 @@ function mapMove(point) {
     var oStatusDiv = document.getElementById("statusDiv")    
     if (oSnap){
         oSnap.getDistAlongRoute(point).toFixed(0);
-        oStatusDiv.innerHTML =  oSnap.getClosestLatLng(point).k + ", " + oSnap.getClosestLatLng(point).D;
+        oStatusDiv.innerHTML =  oSnap.getClosestLatLng(point).k + "," + oSnap.getClosestLatLng(point).D;
     
         $.ajax({
             url: "http://" + ip + ":3000/doQuery?string=INSERT INTO pickup_request (pickup_request.route_name, pickup_request.lat, pickup_request.long) VALUES ('" + vars.route + "', '" + oSnap.getClosestLatLng(point).k + "', '" + oSnap.getClosestLatLng(point).D + "');", 
