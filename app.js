@@ -141,7 +141,7 @@ app.get('/pickup', function(req, res){
 
   phantom.create(function (ph) {
     ph.createPage(function (page) {
-      page.open("http://127.0.0.1:3000/pickupLocEJS?route=" + route + "&lat=" + lat + "&lon=" + lon, function (status) {
+      page.open("http://104.197.3.201:3000/pickupLocEJS?route=" + route + "&lat=" + lat + "&lon=" + lon, function (status) {
         setTimeout(function screenshot() {
           console.log("opened pickupLoc? ", status);
           page.evaluate(function () { return document.getElementById('statusDiv').innerHTML; }, function (result) {
