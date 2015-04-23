@@ -1,5 +1,7 @@
+var ip = '104.197.3.201';
+
 $.ajax({
-    url: 'http://127.0.0.1:3000/route-names',
+    url: 'http://' + ip + ':3000/route-names',
     type: 'GET',
     dataType: 'json',
     success: function(data) { 
@@ -16,9 +18,8 @@ $.ajax({
 });
 
 function deleteRoute(name){
-
     $.ajax({
-        url: 'http://127.0.0.1:3000/delete-route?route=' + name,    // Pass route name here through a query
+        url: 'http://' + ip + ':3000/delete-route?route=' + name,    // Pass route name here through a query
         type: 'GET',
         dataType: 'json',
         success: function(data) { 

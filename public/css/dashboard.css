@@ -6,6 +6,8 @@ html {
   height: 100%;
 }
 body {
+  -webkit-font-smoothing: antialiased;
+  font: 18px / 1.4 'Helvetica', 'Arial', sans-serif;
   padding-top: 50px;
   height: 100%;
 }
@@ -25,7 +27,26 @@ a {
   color: #008542;
   text-decoration: none;
 }
-
+nav li a.active:after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -10px;
+  border: 10px solid;
+  border-color: transparent;
+  border-top-color: #000;
+}
+nav li.dropd-active {
+  background-color: #000;
+}
+nav  ul.dropdown-menu {
+  background-color: #000;
+  border-color: #000;
+}
+nav ul.dropdown-menu li a {
+  color: #FFF;
+}
 /*
  * Sidebar
  */
@@ -133,6 +154,11 @@ a {
   text-align: center;
 }
 .form-center{
+  max-width: 500px; 
+  margin-right: auto; 
+  margin-left: auto;
+}
+#form-center{
   max-width: 500px; 
   margin-right: auto; 
   margin-left: auto;

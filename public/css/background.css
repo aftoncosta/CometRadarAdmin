@@ -1,0 +1,14 @@
+html {
+  width: 100%;
+}
+body {
+  min-height: 100%;
+  min-width: 100%;
+  background-image: url("../img/cover.jpg");
+  background-position: bottom;
+  background-attachment:fixed;
+  background-size: 100%;
+  background-repeat: no-repeat;
+  padding-top: 40px;
+  color: #008542;
+}

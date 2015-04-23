@@ -1,12 +1,15 @@
-var express = require('express');
-var app = express();
-var port    = parseInt(process.env.PORT, 10) || 3000;
-var mysql      = require('mysql');
-var passport = require('passport');
-var util = require('util');
+var express       = require('express');
+var app           = express();
+var port          = parseInt(process.env.PORT, 10) || 3000;
+var mysql         = require('mysql');
+var passport      = require('passport');
+var util          = require('util');
+var multer        = require('multer');
 var LocalStrategy = require('passport-local').Strategy;
-  
-var users = [
+var expressSession = require('express-session');
+var phantom = require('phantom');
+
+var users         = [
     { id: 1, username: 'bob', password: 'secret', email: 'bob@example.com' }
   , { id: 2, username: 'joe', password: 'birthday', email: 'joe@example.com' }
 ];
@@ -70,11 +73,19 @@ passport.use(new LocalStrategy(
   }
 ));
 
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
+
+
 // Configuring Passport
-var expressSession = require('express-session');
 //app.use(expressSession({secret: 'mySecretKey'}));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(express.static(__dirname + "/public"));
 
 app.get('/logout', function(req, res){
   req.logout();
@@ -93,7 +104,7 @@ function ensureAuthenticated(req, res, next) {
 }
 
 
-app.use(express.static(__dirname + "/public"));
+
 
 
 // RIDER APP app
@@ -115,12 +126,67 @@ app.get('/doQuery', function(req, res){
     connection.query(query, function(err, rows, fields){  // calls the query
     
     if (err) throw err;
+      console.log(rows);
     	res.send(rows);   // sends the response data (in JSON format) back to android. You can also check the response at localhost:3001/sendPickup?string=YOUR QUERY HERE
                         // for INSERT commands, it just returns the number of rows changed and some other useless crap
                         // but for SELECT commands, it'll return the DB rows in JSON format. Look at localhost:3000/route-names as an example
     });
     connection.end();
 });
+
+app.get('/pickup', function(req, res){
+  var route = req.query.route; 
+  var lat = req.query.lat; 
+  var lon = req.query.lon; 
+
+  phantom.create(function (ph) {
+    ph.createPage(function (page) {
+      page.open("http://104.197.3.201:3000/pickupLocEJS?route=" + route + "&lat=" + lat + "&lon=" + lon, function (status) {
+        setTimeout(function screenshot() {
+          console.log("opened pickupLoc? ", status);
+          page.evaluate(function () { return document.getElementById('statusDiv').innerHTML; }, function (result) {
+            console.log('Location is ' + result);
+            res.send(result);
+            ph.exit();
+          });
+        }, 3 * 1000);        
+      });
+    });
+  });
+});
+
+
+app.get('/pickupLocEJS', function(req, res){
+  var route = req.query.route; 
+  var lat = req.query.lat; 
+  var lon = req.query.lon; 
+
+  res.render("pickupLoc.ejs", { route: route, lat: lat, lon: lon });
+  console.log("here");
+});
+
+// Upload user photos to /public/uploads
+app.use(multer({ dest: './public/uploads/',
+ rename: function (fieldname, filename) {
+    return filename+Date.now();
+  },
+onFileUploadStart: function (file) {
+  console.log(file.originalname + ' is starting ...')
+},
+onFileUploadComplete: function (file) {
+  console.log(file.fieldname + ' uploaded to  ' + file.path)
+  done=true;
+}
+}));
+
+
+app.post('/api/photo',function(req,res){
+  if(done==true){
+    console.log(req.files.userPhoto.name);
+    res.end(req.files.userPhoto.name);
+  }
+});
+
 
 //Add a user to the database
 app.get('/add-user', function (req, res) {
@@ -142,8 +208,7 @@ app.get('/add-user', function (req, res) {
   lname = req.query.lname;
   type = req.query.tp;
   pwd = req.query.pwd;
-
-  picture = '';
+  picture = req.query.photo;
 
   connection.query('INSERT INTO bsxpccom_cometradar.users VALUES ("' + email + '","' + pwd + '","' + fname + '","' + lname + '","' + type + '","' + picture + '");', function(err, rows, fields){
     if (err) throw err;
@@ -152,7 +217,6 @@ app.get('/add-user', function (req, res) {
   
   connection.end();
 });
-
 
 // Deletes a user
 app.get('/delete-user', function (req, res) {
@@ -395,7 +459,7 @@ app.get('/route-data', function (req, res) {
     }
   });
 
-  connection.query('SELECT route_name, a.shuttle, students_on_shuttle, max, shiftstart_date, shiftend_date, currentLat, currentLong, fname, lname, onduty FROM (SELECT bsxpccom_cometradar.current_route.*, bsxpccom_cometradar.users.fname, bsxpccom_cometradar.users.lname FROM bsxpccom_cometradar.current_route INNER JOIN users ON bsxpccom_cometradar.current_route.email = bsxpccom_cometradar.users.email) a JOIN (SELECT bsxpccom_cometradar.routedata.onduty, bsxpccom_cometradar.routedata.email, bsxpccom_cometradar.routedata.shiftstart_date, bsxpccom_cometradar.routedata.shiftend_date, bsxpccom_cometradar.shuttle.max, bsxpccom_cometradar.shuttle.shuttle FROM bsxpccom_cometradar.routedata INNER JOIN shuttle ON bsxpccom_cometradar.routedata.shuttle = bsxpccom_cometradar.shuttle.shuttle) b ON a.email = b.email AND a.shuttle = b.shuttle;',
+  connection.query('SELECT route_name, a.shuttle, students_on_shuttle, max, shiftstart_date, shiftend_date, currentLat, currentLong, fname, lname,  picture, onduty FROM (SELECT bsxpccom_cometradar.current_route.*, bsxpccom_cometradar.users.fname, bsxpccom_cometradar.users.lname, bsxpccom_cometradar.users.picture FROM bsxpccom_cometradar.current_route INNER JOIN users ON bsxpccom_cometradar.current_route.email = bsxpccom_cometradar.users.email) a JOIN (SELECT bsxpccom_cometradar.routedata.onduty, bsxpccom_cometradar.routedata.email, bsxpccom_cometradar.routedata.shiftstart_date, bsxpccom_cometradar.routedata.shiftend_date, bsxpccom_cometradar.shuttle.max, bsxpccom_cometradar.shuttle.shuttle FROM bsxpccom_cometradar.routedata INNER JOIN shuttle ON bsxpccom_cometradar.routedata.shuttle = bsxpccom_cometradar.shuttle.shuttle) b ON a.email = b.email AND a.shuttle = b.shuttle;',
     function(err, rows, fields){
       if (err) throw err;
       res.send(rows);

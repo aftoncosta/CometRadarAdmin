@@ -1,15 +1,19 @@
 var overlay;
 USGSOverlay.prototype = new google.maps.OverlayView();
 
+
+var ip = '104.197.3.201';
 var map;
 var routeNames = [];
 var cabStatusBool = [];
+var cabMax = [];
 var cabStatusString = [];
 var cabLat = [];
 var cabLong = [];
 var cabNumbers = [];
 var cabOccupancy = [];
 var cabDriver = [];
+var driverPhoto = [];
 var shiftStart = [];
 var shiftEnd = [];
 var cabFull = [];
@@ -27,8 +31,8 @@ function initialize() {
 
   map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
 
-  var swBound = new google.maps.LatLng(32.976600, -96.761700);
-  var neBound = new google.maps.LatLng(32.995650, -96.739400);
+  var swBound = new google.maps.LatLng(32.976600, -96.772500);
+  var neBound = new google.maps.LatLng(32.995650, -96.750600);
   var bounds = new google.maps.LatLngBounds(swBound, neBound);
   var srcImage = '../img/map-overlay.gif';
 
@@ -97,23 +101,28 @@ function createMarkers(id){
   var myLatLng = new google.maps.LatLng(cabLat[id], cabLong[id]);
 
   var marker = new google.maps.Marker({
-        position: myLatLng,
-        map: map,
-        icon: images[id],
-        title: routeNames[id],
-        zIndex: 3
+    position: myLatLng,
+    map: map,
+    icon: images[id],
+    title: routeNames[id],
+    zIndex: 3
   });
 
   google.maps.event.addListener(marker, 'click', function() {
+    initChart();
+    $('.chart').css(
+      {
+        visibility: "visible",
+        display: "block"
+      }
+    );
+    var s = (cabOccupancy[id] == 1) ? '' : 's';
+    document.getElementById("pieDiv").innerHTML = '<div class="chart" data-percent="' + (cabOccupancy[id]/cabMax[id])*100 + '" id="easy-pie-chart"><span class="percent">' + cabOccupancy[id] + ' rider' + s + ' right now</span></div>';
 
-      parent.document.getElementById("cabDetails").innerHTML = "<b>Status:</b> " + cabStatusString[id] + "<br/>"
-                                                              + "<b>Route:</b> " + routeNames[id] + "<br/>"
-                                                              + "<b>Shuttle #:</b> " + cabNumbers[id] + "<br/>"
-                                                              + "<b>Current Occupancy:</b> " + cabOccupancy[id] + "<br/>";
-
-      parent.document.getElementById("driverDetails").innerHTML = "<b>Driver:</b> " + cabDriver[id] + "<br/>"
-                                                              + "<b>Shift start time:</b> " + formatAMPM(new Date(shiftStart[id])) + "<br/>"
-                                                              + "<b>Shift end time:</b> " + formatAMPM(new Date(shiftEnd[id])) + "<br/>";
+    document.getElementById("cabDetails").innerHTML = "<br/><text style='font-size: 150%;'>Driver:</text><br/>" + cabDriver[id] + "<br/><img style='width:210px;height:210px; -webkit-border-radius: 50px;' src='" + driverPhoto[id] + "''><br/><br/>"
+                                                      + "<br/><text style='font-size: 150%;'>Route:</text><br/>" + routeNames[id] + "<br/><br/>"
+                                                      + "<br/><text style='font-size: 150%;'>Shift:</text><br/>" + formatAMPM(new Date(shiftStart[id])) + " - " + formatAMPM(new Date(shiftEnd[id])) + "<br/>"
+                                                      + "<br/><h3 style='margin-bottom: 0px'>Cab #" + cabNumbers[id] + " is </h3><h3 style='font-size: 250%; margin: 0px'>" + cabStatusString[id] + "</h3>" ;
   });
   return marker;
 }
@@ -130,7 +139,6 @@ function formatAMPM(date) {
 }
 
 function USGSOverlay(bounds, image, map) {
-
   // Initialize all properties.
   this.bounds_ = bounds;
   this.image_ = image;
@@ -171,7 +179,6 @@ USGSOverlay.prototype.onAdd = function() {
 };
 
 USGSOverlay.prototype.draw = function() {
-
   // We use the south-west and north-east
   // coordinates of the overlay to peg it to the correct position and size.
   // To do this, we need to retrieve the projection from the overlay.
@@ -201,7 +208,7 @@ USGSOverlay.prototype.onRemove = function() {
 
 var myAjaxCall = function() {
   $.ajax({
-      url: 'http://127.0.0.1:3000/route-data',
+      url: 'http://' + ip + ':3000/route-data',
       type: 'GET',
       dataType: 'json',
       success: function(data) {
@@ -213,7 +220,9 @@ var myAjaxCall = function() {
             cabLong[cab]      = data[cab].currentLong;
             cabNumbers[cab]   = data[cab].shuttle;
             cabOccupancy[cab] = data[cab].students_on_shuttle;
+            cabMax[cab]       = data[cab].max;
             cabDriver[cab]    = data[cab].fname + ' ' + data[cab].lname; 
+            driverPhoto[cab]  = "/uploads/" + data[cab].picture;
             shiftStart[cab]   = data[cab].shiftstart_date;
             shiftEnd[cab]     = data[cab].shiftend_date;
             cabFull[cab]      = (data[cab].students_on_shuttle >= data[cab].max) ? true : false;
@@ -227,3 +236,29 @@ myAjaxCall(); // initial AJAX call
 window.setInterval('myAjaxCall()', 8000); // update data every 5 seconds
 
 google.maps.event.addDomListener(window, 'load', initialize);
+
+var initChart = function(){
+
+  $.getScript('js/easypiechart.js', function(){
+    $('#easy-pie-chart').easyPieChart({
+      animate: 2000,
+      scaleColor: false,
+      lineWidth: 12,
+      lineCap: 'square',
+      size: 200,
+      trackColor: '#e5e5e5',
+      barColor: '#008542'    
+    });
+    $('#easy-pie-chart').css({
+       width : 200 + 'px',
+       height : 200 + 'px'
+    });
+    $('#easy-pie-chart .percent').css({
+      "line-height": 200 + 'px'
+    });
+  });
+};
+
+
+
+

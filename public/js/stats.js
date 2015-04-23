@@ -1,3 +1,5 @@
+var ip = '104.197.3.201';
+
 // Initalize jQuery Datepicker
 $(function() {
 	$( "#datepicker" ).datepicker({
@@ -18,10 +20,8 @@ var overlay, map, pointarray, heatmap, init = false, routeName = "All", startDat
 
 // Initialize the map and the custom overlay.
 function initialize() {
-	
 	createMap();
 	updateMap();
-	//createHeatMap();
 }
 
 function createMap(){
@@ -45,9 +45,6 @@ function createMap(){
 
 function createHeatMap(){
 	// create heatmap
-	//cabData = [];
-	//heatmap.setData(new google.maps.MVCArray(cabData));
-	//toggleHeatmap();
 	var pointArray = heatmap = null;
 	var pointArray = new google.maps.MVCArray(cabData);
 	heatmap = new google.maps.visualization.HeatmapLayer({
@@ -177,7 +174,7 @@ function updateMap(){
 
 
 	$.ajax({
-		url: 'http://127.0.0.1:3000/stops?route=' + routeName + '&startDate=' + startDate + '&endDate=' + endDate,
+		url: 'http://' + ip + ':3000/stops?route=' + routeName + '&startDate=' + startDate + '&endDate=' + endDate,
 		type: 'GET',
 		dataType: 'json',
 		success: function(data) {
@@ -219,7 +216,7 @@ function updateMap(){
 }
 
 $.ajax({
-	url: 'http://127.0.0.1:3000/route-names',
+	url: 'http://' + ip + ':3000/route-names',
 	type: 'GET',
 	dataType: 'json',
 	success: function(data) {
