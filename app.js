@@ -453,6 +453,31 @@ app.get('/api/updateLocation', function (req, res) {
   connection.end(); 
 });
 
+//TODO update with default route coordinates
+app.get('/api/createCurrentRoute', function (req, res) {
+  var connection = mysql.createConnection({
+    host     : '69.195.124.139',
+    user     : 'bsxpccom_teamX',
+    password : 'C$1RFKqdCr&w',
+    database : 'bsxpccom_cometradar'
+  });
+
+  connection.connect(function(err) {
+    if (err) {
+      console.error('error connecting: ' + err.stack);
+      return;
+    }
+    console.log('connected as id ' + connection.threadId);
+  });
+  connection.query('INSERT INTO `current_route` SET route_name=\'' + req.query.rname + '\',email=\'' + req.query.email 
+  	+ '\',shuttle=((SELECT MAX(shuttle) FROM `current_route`)+1),students_on_shuttle=0,currentLat=32.985700,currentLong=-96.752514', 
+  	function (error, results, fields) {
+	    console.log('Error: ' + error);
+	    res.send(results);
+  });
+  connection.end(); 
+});
+
 //updates stop locations on a given route
 //requires rname, lat, long, isPickup
 app.get('/api/updateRouteStops', function(req, res){
@@ -506,6 +531,60 @@ app.get('/api/updateRiderCount', function(req, res){
 
   connection.query('UPDATE `current_route` SET students_on_shuttle=' + req.query.currentCapacity 
   	+ ' WHERE route_name=\'' + req.query.rname + '\'', 
+    function (error, results, fields) {
+    	console.log('Error: ' + error);
+    	res.send(results);
+  	}
+  );
+  connection.end(); 	
+})
+
+//TODO implement duty status ??
+//TODO add date to query
+app.get('/api/getDutyStatus', function(req, res){
+  var connection = mysql.createConnection({
+    host     : '69.195.124.139',
+    user     : 'bsxpccom_teamX',
+    password : 'C$1RFKqdCr&w',
+    database : 'bsxpccom_cometradar'
+  });
+
+  connection.connect(function(err) {
+    if (err) {
+      console.error('error connecting: ' + err.stack);
+      return;
+    }
+    console.log('connected as id ' + connection.threadId);
+  });
+
+  connection.query('SELECT onduty FROM `routedata` WHERE route_name=\'' + req.query.rname + '\' AND email=\'' + req.query.email + '\'', 
+    function (error, results, fields) {
+    	console.log('Error: ' + error);
+    	res.send(results);
+  	}
+  );
+  connection.end(); 	
+})
+
+//TODO add date to query (WHERE NOW() BETWEEN date_from AND date_to)
+app.get('/api/updateDutyStatus', function(req, res){
+  var connection = mysql.createConnection({
+    host     : '69.195.124.139',
+    user     : 'bsxpccom_teamX',
+    password : 'C$1RFKqdCr&w',
+    database : 'bsxpccom_cometradar'
+  });
+
+  connection.connect(function(err) {
+    if (err) {
+      console.error('error connecting: ' + err.stack);
+      return;
+    }
+    console.log('connected as id ' + connection.threadId);
+  });
+
+  connection.query('UPDATE `routedata` SET onduty=' + req.query.dutyStatus +' WHERE route_name=\'' + req.query.rname 
+  	+ '\' AND email=\'' + req.query.email + '\'', 
     function (error, results, fields) {
     	console.log('Error: ' + error);
     	res.send(results);
