@@ -544,10 +544,10 @@ app.get('/api/createCurrentRoute', function (req, res) {
   		function (error, results, fields) {
 		    console.log('Error: ' + error);
 		    res.send('success');
+  			connection.end(); 
   	});
   });
 
-  connection.end(); 
 });
 
 //updates stop locations on a given route
