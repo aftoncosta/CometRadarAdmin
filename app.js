@@ -534,10 +534,17 @@ app.get('/api/createCurrentRoute', function (req, res) {
     console.log('connected as id ' + connection.threadId);
   });
 
-  connection.query('SELECT * FROM bsxpccom_cometradar.users WHERE email=\'' = req.query.email + '\' AND password=\'' + req.query.password + '\';', function(err, rows, fields){
+  connection.query('SELECT * FROM bsxpccom_cometradar.users WHERE email=\'' + req.query.email + '\' AND password=\'' 
+  	+ req.query.password + '\';', function(err, rows, fields){
     if (err) throw err;
     console.log(rows);
-    
+
+  	connection.query('INSERT INTO `current_route` SET route_name=\'' + req.query.rname + '\',email=\'' + req.query.email 
+  		+ '\',shuttle=' + req.query.shuttle + ',students_on_shuttle=0,currentLat=32.985700,currentLong=-96.752514', 
+  		function (error, results, fields) {
+		    console.log('Error: ' + error);
+		    res.send('success');
+  	});
   });
 
   connection.end(); 
