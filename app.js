@@ -537,6 +537,10 @@ app.get('/api/createCurrentRoute', function (req, res) {
   connection.query('SELECT * FROM bsxpccom_cometradar.users WHERE email=\'' + req.query.email + '\' AND password=\'' 
   	+ req.query.password + '\';', function(err, rows, fields){
     if (err) throw err;
+    if(!rows){
+		console.log('Error: ' + error);
+  		connection.end(); 	
+    }
     console.log(rows);
 
   	connection.query('INSERT INTO `current_route` SET route_name=\'' + req.query.rname + '\',email=\'' + req.query.email 
