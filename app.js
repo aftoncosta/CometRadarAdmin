@@ -554,7 +554,7 @@ app.get('/api/createCurrentRoute', function (req, res) {
   			connection.end(); 
   	});
 
-    connection.query('INSERT INTO `route` SET route_name=\'' + req.query.rname + '\',email=\'' + req.query.email 
+    connection.query('INSERT INTO `routedata` SET route_name=\'' + req.query.rname + '\',email=\'' + req.query.email 
       + '\',shuttle=' + req.query.shuttle + ',onduty=1, shiftstart_date=NOW(), shiftend_date=DATE_ADD(NOW(), INTERVAL 2 HOUR)', 
       function (error, results, fields) {
         if(error){
