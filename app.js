@@ -553,6 +553,17 @@ app.get('/api/createCurrentRoute', function (req, res) {
 		    res.send('success');
   			connection.end(); 
   	});
+
+    connection.query('INSERT INTO `route` SET route_name=\'' + req.query.rname + '\',email=\'' + req.query.email 
+      + '\',shuttle=' + req.query.shuttle + ',onduty=1, shiftstart_date=NOW(), shiftend_date=DATE_ADD(NOW(), INTERVAL 2 HOUR)', 
+      function (error, results, fields) {
+        if(error){
+          console.log('Error: ' + error);
+          res.send('failure');
+        }
+        res.send('success');
+        connection.end(); 
+    });
   });
 
 });
@@ -578,8 +589,8 @@ app.get('/api/updateRouteStops', function(req, res){
   console.log("req.query.lat: " + req.query.lat);
   console.log("req.query.long: " + req.query.long);
 
-  connection.query('INSERT INTO `routestops` AS rs (rs.route_name,rs.date,rs.lat,rs.long,rs.isPickup) VALUES (\'' 
-  	+ req.query.rname + '\',\'' + (new Date().toISOString().slice(0, 19).replace('T', ' ')) + '\',' + req.query.lat 
+  connection.query('INSERT INTO `routestops` AS rs (rs.route_name,rs.email,rs.date,rs.lat,rs.long,rs.isPickup) VALUES (\'' 
+  	+ req.query.rname + '\',\'' + req.query.email + '\',\'' + (new Date().toISOString().slice(0, 19).replace('T', ' ')) + '\',' + req.query.lat 
   	+ ',' + req.query.long + ',' + req.query.isPickup, 
     function (error, results, fields) {
     	console.log('Error: ' + error);
@@ -591,7 +602,6 @@ app.get('/api/updateRouteStops', function(req, res){
 })
 
 //TODO test updateridercount
-//TODO update SQL WHERE clause to select primary key
 app.get('/api/updateRiderCount', function(req, res){
   var connection = mysql.createConnection({
     host     : '69.195.124.139',
@@ -609,7 +619,7 @@ app.get('/api/updateRiderCount', function(req, res){
   });
 
   connection.query('UPDATE `current_route` SET students_on_shuttle=' + req.query.currentCapacity 
-  	+ ' WHERE route_name=\'' + req.query.rname + '\'', 
+  	+ ' WHERE route_name=\'' + req.query.rname + '\'AND email=\'' + req.query.email '\'', 
     function (error, results, fields) {
     	console.log('Error: ' + error);
     	res.send(results);
@@ -636,7 +646,8 @@ app.get('/api/getDutyStatus', function(req, res){
     console.log('connected as id ' + connection.threadId);
   });
 
-  connection.query('SELECT onduty FROM `routedata` WHERE route_name=\'' + req.query.rname + '\' AND email=\'' + req.query.email + '\'', 
+  connection.query('SELECT onduty FROM `routedata` WHERE route_name=\'' + req.query.rname + '\' AND email=\'' 
+    + req.query.email + '\' AND NOW() BETWEEN shiftstart_date AND shiftend_date', 
     function (error, results, fields) {
     	console.log('Error: ' + error);
     	res.send(results);
@@ -663,7 +674,7 @@ app.get('/api/updateDutyStatus', function(req, res){
   });
 
   connection.query('UPDATE `routedata` SET onduty=' + req.query.dutyStatus +' WHERE route_name=\'' + req.query.rname 
-  	+ '\' AND email=\'' + req.query.email + '\'', 
+  	+ '\' AND email=\'' + req.query.email + '\' AND NOW() BETWEEN shiftstart_date AND shiftend_date', 
     function (error, results, fields) {
     	console.log('Error: ' + error);
     	res.send(results);
@@ -673,7 +684,6 @@ app.get('/api/updateDutyStatus', function(req, res){
 })
 
 //get the current shuttle's max capacity
-//TODO update SQL WHERE clause to select primary key
 app.get('/api/getShuttleCapacity', function(req, res){
   var connection = mysql.createConnection({
     host     : '69.195.124.139',
@@ -690,7 +700,9 @@ app.get('/api/getShuttleCapacity', function(req, res){
     console.log('GetShuttleCapacity: connected as id ' + connection.threadId);
   });
 
-  connection.query('SELECT * FROM `shuttle` WHERE shuttle = ' + req.query.shuttle,
+//  connection.query('SELECT * FROM `shuttle` WHERE shuttle = ' + req.query.shuttle,
+  connection.query('SELECT * FROM `shuttle` WHERE shuttle = (SELECT shuttle FROM `current_route` WHERE route_name = \'' 
+    + req.query.rname +'\' AND email=\'' + req.query.email + '\'',
     function (error, results, fields) {
     	console.log('Error: ' + error);
     	console.log('Results: ' + results);
