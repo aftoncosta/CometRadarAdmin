@@ -619,7 +619,7 @@ app.get('/api/updateRiderCount', function(req, res){
   });
 
   connection.query('UPDATE `current_route` SET students_on_shuttle=' + req.query.currentCapacity 
-  	+ ' WHERE route_name=\'' + req.query.rname + '\'AND email=\'' + req.query.email '\'', 
+  	+ ' WHERE route_name=\'' + req.query.rname + '\'AND email=\'' + req.query.email + '\'', 
     function (error, results, fields) {
     	console.log('Error: ' + error);
     	res.send(results);
