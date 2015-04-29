@@ -700,7 +700,7 @@ app.get('/api/getShuttleCapacity', function(req, res){
 
 //  connection.query('SELECT * FROM `shuttle` WHERE shuttle = ' + req.query.shuttle,
   connection.query('SELECT * FROM `shuttle` WHERE shuttle = (SELECT shuttle FROM `current_route` WHERE route_name = \'' 
-    + req.query.rname +'\' AND email = \'' + req.query.email + '\'',
+    + req.query.rname +'\' AND email = \'' + req.query.email + '\')',
     function (error, results, fields) {
     	console.log('Error: ' + error);
     	console.log('Results: ' + results);
