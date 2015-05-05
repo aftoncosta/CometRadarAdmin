@@ -126,7 +126,7 @@ app.get('/doQuery', function(req, res){
     connection.query(query, function(err, rows, fields){  // calls the query
     
     if (err) throw err;
-      console.log(rows);
+//      console.log(rows);
     	res.send(rows);   // sends the response data (in JSON format) back to android. You can also check the response at localhost:3001/sendPickup?string=YOUR QUERY HERE
                         // for INSERT commands, it just returns the number of rows changed and some other useless crap
                         // but for SELECT commands, it'll return the DB rows in JSON format. Look at localhost:3000/route-names as an example
@@ -143,9 +143,9 @@ app.get('/pickup', function(req, res){
     ph.createPage(function (page) {
       page.open("http://104.197.3.201:3000/pickupLocEJS?route=" + route + "&lat=" + lat + "&lon=" + lon, function (status) {
         setTimeout(function screenshot() {
-          console.log("opened pickupLoc? ", status);
+//          console.log("opened pickupLoc? ", status);
           page.evaluate(function () { return document.getElementById('statusDiv').innerHTML; }, function (result) {
-            console.log('Location is ' + result);
+//            console.log('Location is ' + result);
             res.send(result);
             ph.exit();
           });
@@ -162,7 +162,7 @@ app.get('/pickupLocEJS', function(req, res){
   var lon = req.query.lon; 
 
   res.render("pickupLoc.ejs", { route: route, lat: lat, lon: lon });
-  console.log("here");
+//  console.log("here");
 });
 
 // Upload user photos to /public/uploads
@@ -171,10 +171,10 @@ app.use(multer({ dest: './public/uploads/',
     return filename+Date.now();
   },
 onFileUploadStart: function (file) {
-  console.log(file.originalname + ' is starting ...')
+//  console.log(file.originalname + ' is starting ...')
 },
 onFileUploadComplete: function (file) {
-  console.log(file.fieldname + ' uploaded to  ' + file.path)
+//  console.log(file.fieldname + ' uploaded to  ' + file.path)
   done=true;
 }
 }));
@@ -182,7 +182,7 @@ onFileUploadComplete: function (file) {
 
 app.post('/api/photo',function(req,res){
   if(done==true){
-    console.log(req.files.userPhoto.name);
+//    console.log(req.files.userPhoto.name);
     res.end(req.files.userPhoto.name);
   }
 });
@@ -482,12 +482,12 @@ app.get('/api/getRiderLocations', function (req, res) {
       console.error('error connecting: ' + err.stack);
       return;
     }
-    console.log('connected as id ' + connection.threadId);
+//    console.log('connected as id ' + connection.threadId);
   });
 
   //TODO add date to query
   connection.query('SELECT pr.lat, pr.long FROM `pickup_request` AS pr WHERE ROUTE_NAME=\'' + req.query.rname + '\'', function (error, results, fields) {
-    console.log('Error: ' + error);
+//    console.log('Error: ' + error);
     res.send(results);
   }); 
   connection.end();
@@ -506,12 +506,12 @@ app.get('/api/updateLocation', function (req, res) {
       console.error('error connecting: ' + err.stack);
       return;
     }
-    console.log('connected as id ' + connection.threadId);
+//    console.log('connected as id ' + connection.threadId);
   });
 
   connection.query('UPDATE `current_route` SET currentLat=\'' + req.query.lat + '\',currentLong=\'' + req.query.long 
     + '\' WHERE route_name=\'' + req.query.rname + '\'', function (error, results, fields) {
-    console.log('Error: ' + error);
+    //console.log('Error: ' + error);
     res.send(results);
   });
   connection.end(); 
@@ -531,7 +531,7 @@ app.get('/api/createCurrentRoute', function (req, res) {
       console.error('error connecting: ' + err.stack);
       return;
     }
-    console.log('connected as id ' + connection.threadId);
+//    console.log('connected as id ' + connection.threadId);
   });
 
   connection.query('SELECT * FROM bsxpccom_cometradar.users WHERE email=\'' + req.query.email + '\' AND password=\'' 
@@ -541,13 +541,13 @@ app.get('/api/createCurrentRoute', function (req, res) {
 		console.log('Error: ' + error);
   		connection.end(); 	
     }
-    console.log(rows);
+//    console.log(rows);
 
   	connection.query('INSERT INTO `current_route` SET route_name=\'' + req.query.rname + '\',email=\'' + req.query.email 
   		+ '\',shuttle=' + req.query.shuttle + ',students_on_shuttle=0,currentLat=32.985700,currentLong=-96.752514', 
   		function (error, results, fields) {
   			if(error){
-		    	console.log('Error: ' + error);
+//		    	console.log('Error: ' + error);
 		    	res.send('failure');
 		    }
 
@@ -581,11 +581,11 @@ app.get('/api/updateRouteStops', function(req, res){
       console.error('error connecting: ' + err.stack);
       return;
     }
-    console.log('connected as id ' + connection.threadId);
+//    console.log('connected as id ' + connection.threadId);
   });
 
-  console.log("req.query.lat: " + req.query.lat);
-  console.log("req.query.long: " + req.query.long);
+  // console.log("req.query.lat: " + req.query.lat);
+  // console.log("req.query.long: " + req.query.long);
 
   connection.query('INSERT INTO `routestops` AS rs (rs.route_name,rs.email,rs.date,rs.lat,rs.long,rs.isPickup) VALUES (\'' 
   	+ req.query.rname + '\',\'' + req.query.email + '\',\'' + (new Date().toISOString().slice(0, 19).replace('T', ' ')) + '\',' + req.query.lat 
@@ -613,13 +613,13 @@ app.get('/api/updateRiderCount', function(req, res){
       console.error('error connecting: ' + err.stack);
       return;
     }
-    console.log('connected as id ' + connection.threadId);
+//    console.log('connected as id ' + connection.threadId);
   });
 
   connection.query('UPDATE `current_route` SET students_on_shuttle=' + req.query.currentCapacity 
   	+ ' WHERE route_name=\'' + req.query.rname + '\'AND email=\'' + req.query.email + '\'', 
     function (error, results, fields) {
-    	console.log('Error: ' + error);
+//    	console.log('Error: ' + error);
     	res.send(results);
   	}
   );
@@ -641,13 +641,13 @@ app.get('/api/getDutyStatus', function(req, res){
       console.error('error connecting: ' + err.stack);
       return;
     }
-    console.log('connected as id ' + connection.threadId);
+//    console.log('connected as id ' + connection.threadId);
   });
 
   connection.query('SELECT onduty FROM `routedata` WHERE route_name=\'' + req.query.rname + '\' AND email=\'' 
     + req.query.email + '\' AND NOW() BETWEEN shiftstart_date AND shiftend_date', 
     function (error, results, fields) {
-    	console.log('Error: ' + error);
+//    	console.log('Error: ' + error);
     	res.send(results);
   	}
   );
@@ -668,13 +668,13 @@ app.get('/api/updateDutyStatus', function(req, res){
       console.error('error connecting: ' + err.stack);
       return;
     }
-    console.log('connected as id ' + connection.threadId);
+//    console.log('connected as id ' + connection.threadId);
   });
 
   connection.query('UPDATE `routedata` SET onduty=' + req.query.dutyStatus +' WHERE route_name=\'' + req.query.rname 
   	+ '\' AND email=\'' + req.query.email + '\' AND NOW() BETWEEN shiftstart_date AND shiftend_date', 
     function (error, results, fields) {
-    	console.log('Error: ' + error);
+//    	console.log('Error: ' + error);
     	res.send(results);
   	}
   );
@@ -695,15 +695,15 @@ app.get('/api/getShuttleCapacity', function(req, res){
       console.error('error connecting: ' + err.stack);
       return;
     }
-    console.log('GetShuttleCapacity: connected as id ' + connection.threadId);
+//    console.log('GetShuttleCapacity: connected as id ' + connection.threadId);
   });
 
 //  connection.query('SELECT * FROM `shuttle` WHERE shuttle = ' + req.query.shuttle,
   connection.query('SELECT * FROM `shuttle` WHERE shuttle = (SELECT shuttle FROM `current_route` WHERE route_name = \'' 
     + req.query.rname +'\' AND email = \'' + req.query.email + '\')',
     function (error, results, fields) {
-    	console.log('Error: ' + error);
-    	console.log('Results: ' + results);
+    	// console.log('Error: ' + error);
+    	// console.log('Results: ' + results);
     	res.send(results);
   	}
   );
